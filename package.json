@@ -1,0 +1,23 @@
+{
+  "name": "postgres-sse",
+  "version": "0.1.0",
+  "description": "Postgres LISTEN/NOTIFY through SSE connection",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --reporter spec"
+  },
+  "devDependencies": {
+    "@types/chai": "4.1.7",
+    "@types/mocha": "5.2.7",
+    "chai": "4.2.0",
+    "mocha": "6.1.4",
+    "typescript": "3.5.2"
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "license": "UNLICENSED"
+}
