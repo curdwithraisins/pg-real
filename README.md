@@ -1,3 +1,2 @@
-# Starter pack for pack
-
-A simple package which can be used as an boilerplate for a new package.
+# Postgres-SSE
+A simple package to notify clients about Postgres updates in real-time through SSE connection.
