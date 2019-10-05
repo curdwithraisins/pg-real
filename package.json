@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@types/chai": "4.1.7",
+    "@types/lodash": "^4.14.141",
     "@types/mocha": "5.2.7",
     "@types/node": "^12.7.8",
     "@types/uuid": "^3.4.5",
@@ -24,6 +25,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@types/pg": "^7.11.2",
+    "lodash": "^4.17.15",
     "pg": "^7.12.1",
     "uuid": "^3.3.3"
   }
