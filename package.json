@@ -14,6 +14,7 @@
     "@types/mocha": "5.2.7",
     "@types/node": "^12.7.8",
     "@types/uuid": "^3.4.5",
+    "@types/pg": "^7.11.2",
     "chai": "4.2.0",
     "mocha": "6.1.4",
     "typescript": "3.5.2"
@@ -24,7 +25,6 @@
   ],
   "license": "UNLICENSED",
   "dependencies": {
-    "@types/pg": "^7.11.2",
     "lodash": "^4.17.15",
     "pg": "^7.12.1",
     "uuid": "^3.3.3"
