@@ -6,11 +6,11 @@ import { Stream } from "stream";
 import { PassThrough } from 'stream';
 import * as uuid from 'uuid';
 
-export interface ISSEStream extends PassThrough {
+export interface IStream extends PassThrough {
     id: string,
 }
 
-export class SSEStream extends PassThrough implements ISSEStream {
+export class CustomStream extends PassThrough implements IStream {
     public id: string = '';
 
     constructor() {
