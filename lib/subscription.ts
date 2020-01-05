@@ -1,8 +1,7 @@
 import { PassThrough } from "stream";
 import * as uuid from 'uuid';
-import { ITigger } from '@lib/postgres/triggers';
-import PGClient from '@lib/postgres/client';
-import { keys, values } from 'lodash';
+import { PGClient } from '@lib/postgres/client';
+import { isArray, cloneDeep, keys, values } from 'lodash';
 
 interface ICallback {
     [cbId: string]: Function | PassThrough,
@@ -11,7 +10,7 @@ interface IPGSubList {
     [channel: string]: ICallback,
 }
 
-export default class Subscription {
+export class Subscription {
     private readonly client: PGClient;
     private listeners: IPGSubList = {};
 
@@ -19,34 +18,47 @@ export default class Subscription {
         this.client = client;
     }
 
-    public async listen(funcs: string | string[], triggers: ITigger | ITigger[]) {
+    public async startListen(channels: string | string[]) {
         if (!this.client) {
             return this;
         }
-        if (funcs) {
-            this.client.setFunctions(funcs);
+        let channelKeys = cloneDeep(channels);
+        if (channelKeys) {
+            if (!isArray(channelKeys)) {
+                channelKeys = [channelKeys];
+            }
+            this.client.setListeners(channelKeys);
         }
-        if (triggers) {
-            this.client.setTriggers(triggers);
-        }
-        // Connect to the client
         this.client.listen(this.notify.bind(this));
-        return keys(this.listeners);
+        return this;
     }
 
-    public async unlisten(channel: string) {
-        const subscribers = this.listeners[channel];
-        if (!subscribers) {
-            throw new Error('Channel doesn\'t exist.');
+    public stopListen(channels: string | string[]) {
+        if (!this.client) {
+            return this;
         }
-        await this.client.query(`UNLISTEN ${channel}`);
+        let channelKeys = cloneDeep(channels);
+        if (!channelKeys) {
+            channelKeys = keys(this.listeners);
+        }
+        if (!isArray(channelKeys)) {
+            channelKeys = [channelKeys];
+        }
+        channelKeys.forEach((channel) => {
+            if (!this.listeners[channel]) {
+                throw new Error('Channel doesn\'t exist.');
+            }
+            this.client.unlisten(channel);
+            delete this.listeners[channel];
+        });
+        return this;
     }
 
     public subscribe(channel: string, cb: Function | PassThrough) {
-        const subscribers = this.listeners[channel];
-        if (!subscribers) {
+        if (!this.listeners[channel]) {
             this.listeners[channel] = {};
         }
+        const subscribers = this.listeners[channel];
         const cbId = uuid();
         subscribers[cbId] = cb;
         return cbId;

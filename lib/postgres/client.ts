@@ -6,7 +6,7 @@ import { ITigger } from '@lib/postgres/triggers';
 import { Client } from 'pg';
 import { isArray } from 'lodash';
 
-export default class PGClient {
+export class PGClient {
     private client!: Client;
 
     public createClient(params: string | object | undefined) {
@@ -34,7 +34,34 @@ export default class PGClient {
         return this;
     }
 
-    public setTriggers(triggers: ITigger | ITigger[]) {
+    public setTriggers(triggers: string | string[]) {
+        let list = cloneDeep(triggers);
+        if (!isArray(list)) {
+            list = [list]
+        }
+        this.client.connect();
+        list.forEach(async (trigger) => {
+            await this.client.query(trigger);
+        });
+        this.client.end();
+        return this;
+    }
+
+    public setListeners(channels: string | string[]) {
+        let list = cloneDeep(channels);
+        if (!isArray(list)) {
+            list = [list];
+        }
+        this.client.connect();
+        list.forEach(async (channel: string) => {
+            await this.client.query(`LISTEN ${channel}`);
+        });
+        this.client.end();
+        return this;
+    }
+
+    public setTriggersAndListeners(triggers: ITigger | ITigger[]) {
+        let list = cloneDeep(triggers);
         if (!isArray(triggers)) {
             triggers = [triggers]
         }
@@ -50,6 +77,10 @@ export default class PGClient {
     public listen(notify: any) {
         this.client.connect();
         this.client.on('notification', notify);
+    }
+
+    public unlisten(channel: string) {
+        this.client.query(`UNLISTEN ${channel}`);
     }
 
     public async query(query: string) {

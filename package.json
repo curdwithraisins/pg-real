@@ -1,32 +1,33 @@
 {
   "name": "postgres-sse",
   "version": "0.1.0",
-  "description": "Postgres LISTEN/NOTIFY through SSE connection",
+  "description": "Postgres LISTEN/NOTIFY through different connections",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "mocha --reporter spec"
   },
+  "dependencies": {
+    "lodash": "4.17.15",
+    "pg": "7.12.1",
+    "uuid": "3.3.3"
+  },
   "devDependencies": {
     "@types/chai": "4.1.7",
-    "@types/lodash": "^4.14.141",
+    "@types/lodash": "4.14.141",
     "@types/mocha": "5.2.7",
-    "@types/node": "^12.7.8",
-    "@types/uuid": "^3.4.5",
-    "@types/pg": "^7.11.2",
+    "@types/node": "12.7.8",
+    "@types/pg": "7.11.2",
+    "@types/uuid": "3.4.5",
     "chai": "4.2.0",
     "mocha": "6.1.4",
+    "sinon": "8.0.2",
     "typescript": "3.5.2"
   },
   "exclude": [
     "node_modules",
     "dist"
   ],
-  "license": "UNLICENSED",
-  "dependencies": {
-    "lodash": "^4.17.15",
-    "pg": "^7.12.1",
-    "uuid": "^3.3.3"
-  }
+  "license": "UNLICENSED"
 }
