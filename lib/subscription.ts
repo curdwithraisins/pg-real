@@ -55,6 +55,9 @@ export class Subscription {
     }
 
     public subscribe(channel: string, cb: Function | PassThrough) {
+        if (!channel || !cb) {
+            throw new Error('Require channel and callback.');
+        }
         if (!this.listeners[channel]) {
             this.listeners[channel] = {};
         }
@@ -64,12 +67,25 @@ export class Subscription {
         return cbId;
     }
 
-    public unsubscribe(channel: string, cbId: string) {
-        const subscribers = this.listeners[channel];
-        if (!subscribers) {
-            throw new Error('Channel doesn\'t exist.');
+    public unsubscribe(channels: string | string[], cbId: string) {
+        let channelKeys = cloneDeep(channels);
+        if (!channelKeys) {
+            channelKeys = keys(this.listeners);
         }
-        delete subscribers[cbId];
+        if (!isArray(channelKeys)) {
+            channelKeys = [channelKeys];
+        }
+        channelKeys.forEach((channel) => {
+            if (!this.listeners[channel]) {
+                throw new Error('Channel doesn\'t exist.');
+            }
+            if (cbId) {
+                delete this.listeners[channel][cbId];
+            } else {
+                delete this.listeners[channel];
+            }
+        });
+        return this;
     }
 
     private notify(data: any) {
