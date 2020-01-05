@@ -1,5 +1,5 @@
 {
-  "name": "pg-subscriber",
+  "name": "pg-real",
   "version": "0.1.0",
   "description": "Postgres subscriber with the different connectors",
   "main": "dist/index.js",
