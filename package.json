@@ -1,7 +1,7 @@
 {
-  "name": "postgres-sse",
+  "name": "pg-subscriber",
   "version": "0.1.0",
-  "description": "Postgres LISTEN/NOTIFY through different connections",
+  "description": "Postgres subscriber with the different connectors",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "scripts": {
