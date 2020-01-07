@@ -3,9 +3,9 @@
  */
 
 export namespace Functions {
-  function onAfterAll(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function afterAll(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
       CREATE OR REPLACE FUNCTION ${name}_after_all_notifier() RETURNS TRIGGER AS $$
       BEGIN
         IF TG_OP = 'INSERT' THEN
@@ -19,11 +19,11 @@ export namespace Functions {
       END;
       $$ LANGUAGE 'plpgsql';
     `;
-  };
+    };
 
-  function onBeforeAll(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function beforeAll(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
       CREATE OR REPLACE FUNCTION ${name}_before_all_notifier() RETURNS TRIGGER AS $$
       BEGIN
         IF TG_OP = 'INSERT' THEN
@@ -37,11 +37,11 @@ export namespace Functions {
       END;
       $$ LANGUAGE 'plpgsql';
     `;
-  };
+    };
 
-  function onAfterInsert(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function afterInsert(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_after_insert_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'INSERT' THEN
@@ -51,11 +51,11 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 
-  function onBeforeInsert(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function beforeInsert(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_before_insert_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'INSERT' THEN
@@ -65,11 +65,11 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 
-  function onAfterUpdate(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function afterUpdate(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_after_update_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'UPDATE' THEN
@@ -79,11 +79,11 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 
-  function onBeforeUpdate(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function beforeUpdate(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_before_update_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'UPDATE' THEN
@@ -93,11 +93,11 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 
-  function onAfterDelete(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function afterDelete(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_after_delete_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'DELETE' THEN
@@ -107,11 +107,11 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 
-  function onBeforeDelete(schema: string, table: string): string {
-    const name = schema + '_' + table;
-    return `
+    export function beforeDelete(schema: string, table: string): string {
+        const name = schema + '_' + table;
+        return `
         CREATE OR REPLACE FUNCTION ${name}_before_delete_notifier() RETURNS TRIGGER AS $$
         BEGIN
           IF TG_OP = 'DELETE' THEN
@@ -121,5 +121,5 @@ export namespace Functions {
         END;
         $$ LANGUAGE 'plpgsql';
       `;
-  };
+    };
 }

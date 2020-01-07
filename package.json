@@ -2,8 +2,28 @@
   "name": "pg-real",
   "version": "0.1.0",
   "description": "Postgres subscriber with the different connectors",
-  "main": "dist/index.js",
+  "author": "Iryna Samsonova <irinasams1@gmail.com> (https://github.com/curdwithraisins)",
+  "keywords": [
+    "postgres",
+    "listeners",
+    "subscribtion",
+    "realtime",
+    "database",
+    "sse"
+  ],
+  "main": "bin/index.js",
   "types": "types/index.d.ts",
+  "engines": {
+    "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curdwithraisins/pg-real.git"
+  },
+  "bugs": {
+    "url": "https://github.com/curdwithraisins/pg-real/issues"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "mocha --reporter spec"
@@ -28,6 +48,5 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "license": "UNLICENSED"
+  ]
 }

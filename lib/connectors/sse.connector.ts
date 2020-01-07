@@ -2,7 +2,7 @@
  */
 const { PassThrough } = require('stream');
 
-export default class SseConnector {
+export class SSEConnector {
     private res: any;
 
     constructor(res: any) {
@@ -18,7 +18,7 @@ export default class SseConnector {
         return this.res.body;
     }
 
-    public write(payload: string = "", channel: string) {
+    public write(payload: string = "", channel: string = null) {
         if (channel) {
             this.res.body.write(`event: ${channel}\n`);
         }

@@ -2,90 +2,85 @@
  * Postgres Client
  */
 import { cloneDeep } from 'lodash';
-import { ITigger } from '@lib/postgres/triggers';
+import { ITrigger } from '@pack-types/index';
 import { Client } from 'pg';
 import { isArray } from 'lodash';
 
-export class PGClient {
-    private client!: Client;
-
-    public createClient(params: string | object | undefined) {
-        let connection = cloneDeep(params);
-        if (typeof connection === 'string') {
-            connection = { connectionString: params };
-        }
-        this.client = connection ? new Client(connection) : new Client();
-        return this;
-    }
-
-    public setClient(client: Client) {
-        this.client = client;
-        return this;
-    }
-
+export class SubscriptionClient extends Client {
     public async setFunctions(funcs: string | string[]) {
-        if (isArray(funcs)) {
-            funcs = [funcs].join('\n');
+        let list = cloneDeep(funcs);
+        if (isArray(list)) {
+            list = list.join('\n');
         }
-
-        this.client.connect();
-        await this.client.query(funcs);
-        this.client.end();
+        this.connect();
+        await this.query(list);
+        this.end();
         return this;
     }
 
-    public setTriggers(triggers: string | string[]) {
+    public async setTriggers(triggers: string | string[]) {
         let list = cloneDeep(triggers);
-        if (!isArray(list)) {
-            list = [list]
+        if (isArray(list)) {
+            list = list.join('\n');
         }
-        this.client.connect();
-        list.forEach(async (trigger) => {
-            await this.client.query(trigger);
-        });
-        this.client.end();
+        this.connect();
+        await this.query(list);
+        this.end();
         return this;
     }
 
-    public setListeners(channels: string | string[]) {
+    public async removeTriggers(triggersNames: string | string[], schema: string, table: string) {
+        if (!schema || !table) {
+            return new Error('Require schema and table.');
+        }
+        let list = cloneDeep(triggersNames);
+        if (!isArray(list)) {
+            list = [list];
+        }
+        this.connect();
+        await this.query(list.map((name) => `DROP TRIGGER IF EXISTS ${name} ON ${schema}.${table};`).join('\n'));
+        this.end();
+        return this;
+    }
+
+    public async setListeners(channels: string | string[]) {
         let list = cloneDeep(channels);
         if (!isArray(list)) {
             list = [list];
         }
-        this.client.connect();
-        list.forEach(async (channel: string) => {
-            await this.client.query(`LISTEN ${channel}`);
-        });
-        this.client.end();
+        this.connect();
+        await this.query(list.map((channel: string) => `LISTEN ${channel};`).join('\n'));
+        this.end();
         return this;
     }
 
-    public setTriggersAndListeners(triggers: ITigger | ITigger[]) {
-        let list = cloneDeep(triggers);
-        if (!isArray(triggers)) {
-            triggers = [triggers]
+    public async removeListeners(channels: string | string[]) {
+        let list = cloneDeep(channels);
+        if (!isArray(list)) {
+            list = [list];
         }
-        this.client.connect();
-        triggers.forEach(async ({trigger, channel}) => {
-            await this.client.query(trigger);
-            await this.client.query(`LISTEN ${channel}`);
-        });
-        this.client.end();
+        this.connect();
+        await this.query(list.map((channel: string) => `UNLISTEN ${channel};`).join('\n'));
+        this.end();
         return this;
     }
 
-    public listen(notify: any) {
-        this.client.connect();
-        this.client.on('notification', notify);
+    public setTriggersAndListeners(triggers: ITrigger | ITrigger[]) {
+        let list = cloneDeep(triggers);
+        if (!isArray(list)) {
+            list = [list]
+        }
+        this.connect();
+        list.forEach(async ({trigger, channel}) => {
+            await this.query(trigger);
+            await this.query(`LISTEN ${channel}`);
+        });
+        this.end();
+        return this;
     }
 
-    public unlisten(channel: string) {
-        this.client.query(`UNLISTEN ${channel}`);
+    public startListen(notify: any) {
+        this.connect();
+        this.on('notification', notify);
     }
-
-    public async query(query: string) {
-        this.client.connect();
-        await this.client.query(query);
-        this.client.end();
-    }
-};
+}

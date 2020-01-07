@@ -5,8 +5,9 @@ const { before } = require('mocha');
 const { spy } = require('sinon');
 const { keys } = require('lodash');
 const pgMock = require('./pgMock');
+const { Functions } = require('../dist/postgres/functions');
 
-describe('SubscriptionService', () => {
+describe('Subscriber', () => {
     let client;
     let service;
 
@@ -14,6 +15,8 @@ describe('SubscriptionService', () => {
        client = new PGClient();
        client.setClient(pgMock);
        service = new Subscription(client);
+       console.log(Functions);
+
    });
 
     describe('startListen', () => {
