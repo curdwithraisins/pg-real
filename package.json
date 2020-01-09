@@ -16,6 +16,10 @@
   "engines": {
     "node": "*"
   },
+  "files": [
+    "./bin/*",
+    "./types/index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/curdwithraisins/pg-real.git"
@@ -26,6 +30,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "lint": "tslint -p tsconfig.json",
     "test": "mocha --reporter spec"
   },
   "dependencies": {
@@ -43,10 +48,7 @@
     "chai": "4.2.0",
     "mocha": "6.1.4",
     "sinon": "8.0.2",
-    "typescript": "3.5.2"
-  },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+    "typescript": "3.5.2",
+    "tslint": "5.20.1"
+  }
 }

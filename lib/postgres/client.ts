@@ -12,9 +12,7 @@ export class SubscriptionClient extends Client {
         if (isArray(list)) {
             list = list.join('\n');
         }
-        this.connect();
         await this.query(list);
-        this.end();
         return this;
     }
 
@@ -23,9 +21,7 @@ export class SubscriptionClient extends Client {
         if (isArray(list)) {
             list = list.join('\n');
         }
-        this.connect();
         await this.query(list);
-        this.end();
         return this;
     }
 
@@ -37,9 +33,7 @@ export class SubscriptionClient extends Client {
         if (!isArray(list)) {
             list = [list];
         }
-        this.connect();
         await this.query(list.map((name) => `DROP TRIGGER IF EXISTS ${name} ON ${schema}.${table};`).join('\n'));
-        this.end();
         return this;
     }
 
@@ -48,9 +42,7 @@ export class SubscriptionClient extends Client {
         if (!isArray(list)) {
             list = [list];
         }
-        this.connect();
         await this.query(list.map((channel: string) => `LISTEN ${channel};`).join('\n'));
-        this.end();
         return this;
     }
 
@@ -59,9 +51,7 @@ export class SubscriptionClient extends Client {
         if (!isArray(list)) {
             list = [list];
         }
-        this.connect();
         await this.query(list.map((channel: string) => `UNLISTEN ${channel};`).join('\n'));
-        this.end();
         return this;
     }
 
@@ -70,17 +60,14 @@ export class SubscriptionClient extends Client {
         if (!isArray(list)) {
             list = [list]
         }
-        this.connect();
         list.forEach(async ({trigger, channel}) => {
             await this.query(trigger);
             await this.query(`LISTEN ${channel}`);
         });
-        this.end();
         return this;
     }
 
     public startListen(notify: any) {
-        this.connect();
         this.on('notification', notify);
     }
 }

@@ -9,5 +9,7 @@
       "@pack-types/*": ["./types/*"],
       "@lib/*": ["./lib/*"]
     }
-  }
+  },
+  "include": ["lib"],
+  "exclude": ["node_modules", "**/__tests__/*"]
 }
