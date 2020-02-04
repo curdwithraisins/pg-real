@@ -16,6 +16,15 @@ export class SubscriptionClient extends Client {
         return this;
     }
 
+    public async dropFunctions(funcs: string | string[]) {
+        let list = cloneDeep(funcs);
+        if (isArray(list)) {
+            list = list.join(', ');
+        }
+        await this.query(`DROP FUNCTION ${list}`);
+        return this;
+    }
+
     public async setTriggers(triggers: string | string[]) {
         let list = cloneDeep(triggers);
         if (isArray(list)) {
