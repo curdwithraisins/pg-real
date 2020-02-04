@@ -1,13 +1,13 @@
-#pg-real
+# pg-real
 A simple package to notify clients about Postgres updates in real-time through HTTP/SSE/WebSockets connection.
 
-###Installation
+### Installation
 
 ```npm install pg-real```
 
-###Usage
+### Usage
 
-####Client
+#### Client
 
 A Postgres Client is a basic thing we need for notifier. We recommend you to use our **SubscriptionClient** from this lib but you an also use your own client.
 
@@ -23,6 +23,13 @@ A Postgres Client is a basic thing we need for notifier. We recommend you to use
 * **setTriggersAndListeners**:*ITrigger | ITrigger[]* - takes linked triggers and listeners, create triggers and start listening on them;
 * **startListen**:*any* - takes function, connection etc and send notification from Postgres to it when it occurs.
 
-####Functions
+**SubscriptionClient** extends basic [node-postgres](https://github.com/brianc/node-postgres) client. It takes all the same parameters and doesn't override any of its methods. Refers original documentation to get more information about this library.
 
-####Triggers
+```javascript
+import { SubscriptionClient } from 'pg-real';
+const subscriptionClient = new SubscriptionClient(<client options>);
+```
+
+#### Functions
+
+#### Triggers
