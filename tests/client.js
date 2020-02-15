@@ -1,2 +1,2 @@
-describe('PGClient', () => {
+describe('SubClient', () => {
 });

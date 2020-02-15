@@ -4,7 +4,7 @@ import { SubscriptionClient } from '@lib/postgres/client';
 import { isArray, cloneDeep, keys, values } from 'lodash';
 import { IPGSubList } from '@pack-types/index';
 
-export class Subscriber {
+export class Index {
     private readonly client: SubscriptionClient;
     private listeners: IPGSubList = {};
 

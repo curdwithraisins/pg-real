@@ -1,12 +1,15 @@
 /**
  * Postgres Client
  */
-import { cloneDeep } from 'lodash';
-import { ITrigger } from '@pack-types/index';
+import { cloneDeep, isArray } from 'lodash';
+import { ISubClient, ITrigger } from '@pack-types/index';
 import { Client } from 'pg';
-import { isArray } from 'lodash';
 
-export class SubscriptionClient extends Client {
+export class SubClient extends Client implements ISubClient {
+    /**
+     * Set trigger function
+     * @param funcs: string | string[] - trigger function or list of functions to set
+     */
     public async setFunctions(funcs: string | string[]) {
         let list = cloneDeep(funcs);
         if (isArray(list)) {
@@ -16,8 +19,12 @@ export class SubscriptionClient extends Client {
         return this;
     }
 
-    public async dropFunctions(funcs: string | string[]) {
-        let list = cloneDeep(funcs);
+    /**
+     * Drop trigger function
+     * @param funcsName: string | string[] - function name or list of names to drop
+     */
+    public async dropFunctions(funcsName: string | string[]) {
+        let list = cloneDeep(funcsName);
         if (isArray(list)) {
             list = list.join(', ');
         }
@@ -25,6 +32,10 @@ export class SubscriptionClient extends Client {
         return this;
     }
 
+    /**
+     * Set trigger
+     * @param triggers: string | string[] - trigger or list of triggers
+     */
     public async setTriggers(triggers: string | string[]) {
         let list = cloneDeep(triggers);
         if (isArray(list)) {
@@ -34,6 +45,12 @@ export class SubscriptionClient extends Client {
         return this;
     }
 
+    /**
+     * Remove trigger
+     * @param triggersNames: string | string[] - trigger name or list of names
+     * @param schema: string - schema name
+     * @param table: string - table name
+     */
     public async removeTriggers(triggersNames: string | string[], schema: string, table: string) {
         if (!schema || !table) {
             return new Error('Require schema and table.');
@@ -46,37 +63,38 @@ export class SubscriptionClient extends Client {
         return this;
     }
 
+    /**
+     * Set listeners and start notification process for it
+     * @param channels: string | string[] - channel or list of channels
+     */
     public async setListeners(channels: string | string[]) {
         let list = cloneDeep(channels);
         if (!isArray(list)) {
             list = [list];
         }
-        await this.query(list.map((channel: string) => `LISTEN ${channel};`).join('\n'));
+        await Promise.all(list.map((channel: string) => this.query(`LISTEN ${channel};`)));
         return this;
     }
 
+    /**
+     * Remove listener and stop notification process for it
+     * @param channels: string | string[] - channel or list of channels
+     */
     public async removeListeners(channels: string | string[]) {
         let list = cloneDeep(channels);
         if (!isArray(list)) {
             list = [list];
         }
-        await this.query(list.map((channel: string) => `UNLISTEN ${channel};`).join('\n'));
+        await Promise.all(list.map((channel: string) => this.query(`UNLISTEN ${channel};`)));
         return this;
     }
 
-    public setTriggersAndListeners(triggers: ITrigger | ITrigger[]) {
-        let list = cloneDeep(triggers);
-        if (!isArray(list)) {
-            list = [list]
-        }
-        list.forEach(async ({trigger, channel}) => {
-            await this.query(trigger);
-            await this.query(`LISTEN ${channel}`);
-        });
-        return this;
-    }
-
-    public startListen(notify: any) {
+    /**
+     * Set function which will be triggered when event occurs
+     * Only one function can be set!
+     * @param notify: any - notification function
+     */
+    public setNotifier(notify: any) {
         this.on('notification', notify);
     }
 }
