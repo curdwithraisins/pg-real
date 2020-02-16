@@ -1,10 +1,10 @@
-const { Subscription } = require('../dist/subscription');
-const { PGClient } = require('../dist/postgres/client');
 const { expect } = require('chai');
 const { before } = require('mocha');
 const { spy } = require('sinon');
 const { keys } = require('lodash');
-const pgMock = require('./pgMock');
+
+const { Subscriber } = require('../dist/subscriper');
+const { SubClient } = require('../dist/postgres/client');
 const { Functions } = require('../dist/postgres/functions');
 
 describe('Subscriber', () => {
@@ -12,11 +12,8 @@ describe('Subscriber', () => {
     let service;
 
    before(() => {
-       client = new PGClient();
-       client.setClient(pgMock);
-       service = new Subscription(client);
-       console.log(Functions);
-
+       client = new SubClient();
+       service = new Subscriber(client);
    });
 
     describe('startListen', () => {

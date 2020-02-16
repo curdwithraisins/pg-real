@@ -27,6 +27,6 @@ export interface ISubClient extends Client {
 interface ICallback {
     [cbId: string]: Function | PassThrough,
 }
-interface IPGSubList {
+interface IListeners {
     [channel: string]: ICallback,
 }

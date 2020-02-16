@@ -1,49 +1,89 @@
 import { PassThrough } from "stream";
 import * as uuid from 'uuid';
-import { SubscriptionClient } from '@lib/postgres/client';
+import { SubClient } from '@lib/postgres/client';
 import { isArray, cloneDeep, keys, values } from 'lodash';
-import { IPGSubList } from '@pack-types/index';
+import { IListeners } from '@pack-types/index';
 
-export class Index {
-    private readonly client: SubscriptionClient;
-    private listeners: IPGSubList = {};
+export class Subscriber {
+    private readonly client: SubClient;
+    private listeners: IListeners = {};
 
-    constructor(client: SubscriptionClient) {
+    constructor(client: SubClient) {
+        if (!client) {
+            throw new Error('Client is not provided.');
+        }
         this.client = client;
+        this.client.setNotifier(notify.bind(this));
     }
 
-    public startListen() {
-        if (!this.client) {
-            return this;
+    /**
+     * Start listen to channels
+     * @param channels: string | string[]
+     */
+    public async startListen(channels: string | string[]) {
+        if (!channels || !channels.length) {
+            throw Error('Provide channels names to start listen to.');
         }
-        this.client.startListen(notify.bind(this));
+        let channelsKeys = cloneDeep(channels);
+        if (!isArray(channelsKeys)) {
+            channelsKeys = [channelsKeys]
+        }
+        await this.client.setListeners(channelsKeys);
+        channelsKeys.forEach(key => {
+            this.listeners[key] = {};
+        });
         return this;
     }
 
-    public async stopListen() {
-        if (!this.client) {
-            return this;
+    /**
+     * Stop listen to one, several or all channels and notify when one of those events occurs
+     * @param channels: string | string[] - channel name or list of names
+     */
+    public async stopListen(channels: string | string[] = null) {
+        let channelsKeys = cloneDeep(channels);
+        channelsKeys = channelsKeys || keys(this.listeners);
+        if (!isArray(channelsKeys)) {
+            channelsKeys = [channelsKeys]
         }
-        let channelKeys = keys(this.listeners);
-        await this.client.removeListeners(channelKeys);
-        this.listeners = {};
+        await this.client.removeListeners(channelsKeys);
+        channelsKeys.forEach(key => {
+            delete this.listeners[key];
+        });
         return this;
     }
 
-    public subscribe(channel: string, cb: Function | PassThrough) {
-        if (!channel || !cb) {
+    /**
+     * Subscribe to channel and set a corresponding callback
+     * @param channel: string | string[]  - channel name of list of names
+     * @param cb: Function | PassThrough - callback function or stream
+     * @return callback id, used for unsubscription
+     */
+    public subscribe(channel: string | string[], cb: Function | PassThrough): string | string[] {
+        if (!channel || !channel.length || !cb) {
             throw new Error('Require channel and callback.');
         }
-        if (!this.listeners[channel]) {
-            this.listeners[channel] = {};
+        let channelsList = cloneDeep(channel);
+        if (!isArray(channelsList)) {
+            channelsList = [channelsList];
         }
-        const subscribers = this.listeners[channel];
-        const cbId = uuid();
-        subscribers[cbId] = cb;
-        return cbId;
+        let cbIds = [];
+        channelsList.forEach(name => {
+            if (!this.listeners[name]) {
+                this.listeners[name] = {};
+            }
+            const cbId = uuid();
+            cbIds.push(cbId);
+            this.listeners[name][cbId] = cb;
+        });
+        return cbIds.length == 1 ? cbIds[0] : cbIds;
     }
 
-    public unsubscribe(channels: string | string[], cbId: string) {
+    /**
+     * Unsubscribe from channel
+     * @param channels: string | string[] - one or several channels, all channels if not provided
+     * @param cbId: string | string[] - callback id, remove all callbacks from channels listeners if not provided
+     */
+    public unsubscribe(channels: string | string[] = null, cbId: string | string[] = null) {
         let channelKeys = cloneDeep(channels);
         if (!channelKeys) {
             channelKeys = keys(this.listeners);
@@ -51,11 +91,23 @@ export class Index {
         if (!isArray(channelKeys)) {
             channelKeys = [channelKeys];
         }
+        let callbacks = cloneDeep(cbId);
+        if (!callbacks) {
+            callbacks = [];
+        }
+        if (!isArray(callbacks)) {
+            callbacks = [callbacks];
+        }
         channelKeys.forEach((channel) => {
             if (!this.listeners[channel]) {
-                throw new Error(`Channel ${channel} doesn\'t exist.`);
+                throw new Error(`Channel ${channel} does not exist.`);
             }
-            cbId ? delete this.listeners[channel][cbId] : delete this.listeners[channel];
+            // @ts-ignore
+            !callbacks.length ? delete this.listeners[channel] : callbacks.forEach(cb => {
+                if (this.listeners[channel][cb]) {
+                    delete this.listeners[channel][cb];
+                }
+            });
         });
         return this;
     }

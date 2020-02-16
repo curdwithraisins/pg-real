@@ -1,4 +1,5 @@
 /**
+ * SSEConnector
  */
 const { PassThrough } = require('stream');
 
@@ -18,7 +19,13 @@ export class SSEConnector {
         return this.res.body;
     }
 
-    public write(payload: string = "", channel: string = null) {
+    /**
+     * Send message to the client
+     * Use this function for subscription
+     * @param payload: string - message for client
+     * @param channel: string - event channel, not required
+     */
+    public send(payload: string = "", channel: string = null) {
         if (channel) {
             this.res.body.write(`event: ${channel}\n`);
         }
