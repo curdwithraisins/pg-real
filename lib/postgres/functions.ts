@@ -1,150 +1,150 @@
 /**
  * Functions for Postgres
  */
-import { IFunction } from '@pack-types/index';
+import { IFunction } from "@pack-types/index";
 
-export namespace Functions {
-    export function afterAll(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+export class Functions {
+    public static afterAll(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_after_all`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_all_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'INSERT' THEN
-                        PERFORM pg_notify(CAST('${name}_after_all' AS text), row_to_json(NEW)::text);
-                    ELSIF TG_OP = 'UPDATE' THEN
-                        PERFORM pg_notify(CAST('${name}_after_all' AS text), row_to_json(NEW)::text);
-                    ELSIF TG_OP = 'DELETE' THEN
-                        PERFORM pg_notify(CAST('${name}_after_all' AS text), row_to_json(OLD)::text);    
+                    IF TG_OP = "INSERT" THEN
+                        PERFORM pg_notify(CAST("${name}_after_all" AS text), row_to_json(NEW)::text);
+                    ELSIF TG_OP = "UPDATE" THEN
+                        PERFORM pg_notify(CAST("${name}_after_all" AS text), row_to_json(NEW)::text);
+                    ELSIF TG_OP = "DELETE" THEN
+                        PERFORM pg_notify(CAST("${name}_after_all" AS text), row_to_json(OLD)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_after_all`
-        }
+        };
     }
 
-    export function beforeAll(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static beforeAll(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_before_all`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_all_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'INSERT' THEN
-                        PERFORM pg_notify(CAST('${name}_before_all' AS text), row_to_json(NEW)::text);
-                    ELSIF TG_OP = 'UPDATE' THEN
-                        PERFORM pg_notify(CAST('${name}_before_all' AS text), row_to_json(NEW)::text);
-                    ELSIF TG_OP = 'DELETE' THEN
-                        PERFORM pg_notify(CAST('${name}_before_all' AS text), row_to_json(OLD)::text);    
+                    IF TG_OP = "INSERT" THEN
+                        PERFORM pg_notify(CAST("${name}_before_all" AS text), row_to_json(NEW)::text);
+                    ELSIF TG_OP = "UPDATE" THEN
+                        PERFORM pg_notify(CAST("${name}_before_all" AS text), row_to_json(NEW)::text);
+                    ELSIF TG_OP = "DELETE" THEN
+                        PERFORM pg_notify(CAST("${name}_before_all" AS text), row_to_json(OLD)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_before_all`
         };
     }
 
-    export function afterInsert(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static afterInsert(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_after_insert`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_insert_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'INSERT' THEN
-                        PERFORM pg_notify(CAST('${name}_after_insert' AS text), row_to_json(NEW)::text);
+                    IF TG_OP = "INSERT" THEN
+                        PERFORM pg_notify(CAST("${name}_after_insert" AS text), row_to_json(NEW)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_after_insert`
         };
     }
 
-    export function beforeInsert(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static beforeInsert(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_before_insert`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_insert_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'INSERT' THEN
-                        PERFORM pg_notify(CAST('${name}_before_insert' AS text), row_to_json(NEW)::text);
+                    IF TG_OP = "INSERT" THEN
+                        PERFORM pg_notify(CAST("${name}_before_insert" AS text), row_to_json(NEW)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_before_insert`
         };
     }
 
-    export function afterUpdate(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static afterUpdate(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_after_update`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_update_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'UPDATE' THEN
-                        PERFORM pg_notify(CAST('${name}_after_update' AS text), row_to_json(NEW)::text);
+                    IF TG_OP = "UPDATE" THEN
+                        PERFORM pg_notify(CAST("${name}_after_update" AS text), row_to_json(NEW)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_after_update`
         };
     }
 
-    export function beforeUpdate(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static beforeUpdate(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_before_update`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_update_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'UPDATE' THEN
-                        PERFORM pg_notify(CAST('${name}_before_update' AS text), row_to_json(NEW)::text);
+                    IF TG_OP = "UPDATE" THEN
+                        PERFORM pg_notify(CAST("${name}_before_update" AS text), row_to_json(NEW)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_before_update`
         };
     }
 
-    export function afterDelete(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static afterDelete(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_after_delete`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_delete_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'DELETE' THEN
-                        PERFORM pg_notify(CAST('${name}_after_delete' AS text), row_to_json(OLD)::text);
+                    IF TG_OP = "DELETE" THEN
+                        PERFORM pg_notify(CAST("${name}_after_delete" AS text), row_to_json(OLD)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_after_delete`
         };
     }
 
-    export function beforeDelete(schema: string, table: string): IFunction {
-        const name = schema + '_' + table;
+    public static beforeDelete(schema: string, table: string): IFunction {
+        const name = schema + "_" + table;
         return {
+            channel: `${name}_before_delete`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_delete_notifier() RETURNS TRIGGER AS $$
                 BEGIN
-                    IF TG_OP = 'DELETE' THEN
-                        PERFORM pg_notify(CAST('${name}_before_delete' AS text), row_to_json(OLD)::text);
+                    IF TG_OP = "DELETE" THEN
+                        PERFORM pg_notify(CAST("${name}_before_delete" AS text), row_to_json(OLD)::text);
                     END IF;
                     RETURN NEW;
                 END;
-                $$ LANGUAGE 'plpgsql';
+                $$ LANGUAGE "plpgsql";
             `,
-            channel: `${name}_before_delete`
         };
     }
 }

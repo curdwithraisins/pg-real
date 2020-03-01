@@ -1,8 +1,11 @@
+/**
+ * Subscriber
+ */
+import { SubClient } from "@lib/postgres/client";
+import { IListeners } from "@pack-types/index";
+import { cloneDeep, isArray, keys, values } from "lodash";
 import { PassThrough } from "stream";
-import * as uuid from 'uuid';
-import { SubClient } from '@lib/postgres/client';
-import { isArray, cloneDeep, keys, values } from 'lodash';
-import { IListeners } from '@pack-types/index';
+import * as uuid from "uuid";
 
 export class Subscriber {
     private readonly client: SubClient;
@@ -10,7 +13,7 @@ export class Subscriber {
 
     constructor(client: SubClient) {
         if (!client) {
-            throw new Error('Client is not provided.');
+            throw new Error("Client is not provided.");
         }
         this.client = client;
         this.client.setNotifier(notify.bind(this));
@@ -22,14 +25,14 @@ export class Subscriber {
      */
     public async startListen(channels: string | string[]) {
         if (!channels || !channels.length) {
-            throw Error('Provide channels names to start listen to.');
+            throw Error("Provide channels names to start listen to.");
         }
         let channelsKeys = cloneDeep(channels);
         if (!isArray(channelsKeys)) {
-            channelsKeys = [channelsKeys]
+            channelsKeys = [channelsKeys];
         }
         await this.client.setListeners(channelsKeys);
-        channelsKeys.forEach(key => {
+        channelsKeys.forEach((key) => {
             this.listeners[key] = {};
         });
         return this;
@@ -43,10 +46,10 @@ export class Subscriber {
         let channelsKeys = cloneDeep(channels);
         channelsKeys = channelsKeys || keys(this.listeners);
         if (!isArray(channelsKeys)) {
-            channelsKeys = [channelsKeys]
+            channelsKeys = [channelsKeys];
         }
         await this.client.removeListeners(channelsKeys);
-        channelsKeys.forEach(key => {
+        channelsKeys.forEach((key) => {
             delete this.listeners[key];
         });
         return this;
@@ -60,14 +63,14 @@ export class Subscriber {
      */
     public subscribe(channel: string | string[], cb: Function | PassThrough): string | string[] {
         if (!channel || !channel.length || !cb) {
-            throw new Error('Require channel and callback.');
+            throw new Error("Require channel and callback.");
         }
         let channelsList = cloneDeep(channel);
         if (!isArray(channelsList)) {
             channelsList = [channelsList];
         }
-        let cbIds = [];
-        channelsList.forEach(name => {
+        const cbIds = [];
+        channelsList.forEach((name) => {
             if (!this.listeners[name]) {
                 this.listeners[name] = {};
             }
@@ -75,7 +78,7 @@ export class Subscriber {
             cbIds.push(cbId);
             this.listeners[name][cbId] = cb;
         });
-        return cbIds.length == 1 ? cbIds[0] : cbIds;
+        return cbIds.length === 1 ? cbIds[0] : cbIds;
     }
 
     /**
@@ -103,7 +106,7 @@ export class Subscriber {
                 throw new Error(`Channel ${channel} does not exist.`);
             }
             // @ts-ignore
-            !callbacks.length ? delete this.listeners[channel] : callbacks.forEach(cb => {
+            !callbacks.length ? delete this.listeners[channel] : callbacks.forEach((cb) => {
                 if (this.listeners[channel][cb]) {
                     delete this.listeners[channel][cb];
                 }
@@ -114,9 +117,9 @@ export class Subscriber {
 }
 
 const notify = (data: any) => {
-    let {channel, payload} = data;
+    const {channel, payload} = data;
     values(this.listeners[channel]).forEach((cb: Function | PassThrough) => {
-        if (typeof cb == 'function') {
+        if (typeof cb === "function") {
             cb(channel, payload);
         } else {
             cb.write(`event: ${channel}\n`);

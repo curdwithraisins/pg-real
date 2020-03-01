@@ -11,8 +11,8 @@ export class HttpConnector {
 
     public initStream() {
         this.res.status(200);
-        this.res.setHeader('Access-Control-Allow-Origin', '*');
-        this.res.setHeader('Cache-Control', 'no-cache');
+        this.res.setHeader("Access-Control-Allow-Origin", "*");
+        this.res.setHeader("Cache-Control", "no-cache");
         return this.res.body;
     }
 
@@ -22,6 +22,6 @@ export class HttpConnector {
      * @param channel: string - event channel, not required
      */
     public send(payload: string = "", channel: string = null) {
-        this.res.body = `${channel ? 'event: ' + channel + '; ' : ''}data: ${payload}`;
+        this.res.body = `${channel ? "event: " + channel + "; " : ""}data: ${payload}`;
     }
 }

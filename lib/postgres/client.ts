@@ -1,9 +1,9 @@
 /**
  * Postgres Client
  */
-import { cloneDeep, isArray } from 'lodash';
-import { ISubClient, ITrigger } from '@pack-types/index';
-import { Client } from 'pg';
+import { ISubClient } from "@pack-types/index";
+import { cloneDeep, isArray } from "lodash";
+import { Client } from "pg";
 
 export class SubClient extends Client implements ISubClient {
     /**
@@ -13,7 +13,7 @@ export class SubClient extends Client implements ISubClient {
     public async setFunctions(funcs: string | string[]) {
         let list = cloneDeep(funcs);
         if (isArray(list)) {
-            list = list.join('\n');
+            list = list.join("\n");
         }
         await this.query(list);
         return this;
@@ -26,7 +26,7 @@ export class SubClient extends Client implements ISubClient {
     public async dropFunctions(funcsName: string | string[]) {
         let list = cloneDeep(funcsName);
         if (isArray(list)) {
-            list = list.join(', ');
+            list = list.join(", ");
         }
         await this.query(`DROP FUNCTION ${list}`);
         return this;
@@ -39,7 +39,7 @@ export class SubClient extends Client implements ISubClient {
     public async setTriggers(triggers: string | string[]) {
         let list = cloneDeep(triggers);
         if (isArray(list)) {
-            list = list.join('\n');
+            list = list.join("\n");
         }
         await this.query(list);
         return this;
@@ -53,13 +53,13 @@ export class SubClient extends Client implements ISubClient {
      */
     public async removeTriggers(triggersNames: string | string[], schema: string, table: string) {
         if (!schema || !table) {
-            return new Error('Require schema and table.');
+            return new Error("Require schema and table.");
         }
         let list = cloneDeep(triggersNames);
         if (!isArray(list)) {
             list = [list];
         }
-        await this.query(list.map((name) => `DROP TRIGGER IF EXISTS ${name} ON ${schema}.${table};`).join('\n'));
+        await this.query(list.map((name) => `DROP TRIGGER IF EXISTS ${name} ON ${schema}.${table};`).join("\n"));
         return this;
     }
 
@@ -95,6 +95,6 @@ export class SubClient extends Client implements ISubClient {
      * @param notify: any - notification function
      */
     public setNotifier(notify: any) {
-        this.on('notification', notify);
+        this.on("notification", notify);
     }
 }

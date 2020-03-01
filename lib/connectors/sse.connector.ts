@@ -1,7 +1,7 @@
 /**
  * SSEConnector
  */
-const { PassThrough } = require('stream');
+const { PassThrough } = require("stream");
 
 export class SSEConnector {
     private res: any;
@@ -12,9 +12,9 @@ export class SSEConnector {
 
     public initStream() {
         this.res.status(200);
-        this.res.setHeader('Content-Type', 'text/event-stream;charset=utf-8');
-        this.res.setHeader('Access-Control-Allow-Origin', '*');
-        this.res.setHeader('Cache-Control', 'no-cache');
+        this.res.setHeader("Content-Type", "text/event-stream;charset=utf-8");
+        this.res.setHeader("Access-Control-Allow-Origin", "*");
+        this.res.setHeader("Cache-Control", "no-cache");
         this.res.body = PassThrough.create();
         return this.res.body;
     }
