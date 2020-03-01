@@ -31,7 +31,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
-    "test": "mocha --reporter spec"
+    "test": "mocha 'tests/*.js' --reporter spec"
   },
   "dependencies": {
     "lodash": "4.17.15",
@@ -46,7 +46,7 @@
     "@types/pg": "7.11.2",
     "@types/uuid": "3.4.5",
     "chai": "4.2.0",
-    "mocha": "6.1.4",
+    "mocha": "7.1.0",
     "sinon": "8.0.2",
     "typescript": "3.5.2",
     "tslint": "5.20.1"

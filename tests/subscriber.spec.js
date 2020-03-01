@@ -1,11 +1,13 @@
+/**
+ * Subscriber tests
+ */
 const { expect } = require('chai');
 const { before } = require('mocha');
 const { spy } = require('sinon');
 const { keys } = require('lodash');
 
-const { Subscriber } = require('../dist/subscriper');
-const { SubClient } = require('../dist/postgres/client');
-const { Functions } = require('../dist/postgres/functions');
+const { Subscriber: SubscriberSpec } = require('../bin/subscriber');
+const { SubClient } = require('../bin/postgres/client');
 
 describe('Subscriber', () => {
     let client;
@@ -13,7 +15,7 @@ describe('Subscriber', () => {
 
    before(() => {
        client = new SubClient();
-       service = new Subscriber(client);
+       service = new SubscriberSpec(client);
    });
 
     describe('startListen', () => {
