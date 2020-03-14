@@ -33,3 +33,5 @@ const subscriptionClient = new SubscriptionClient(<client options>);
 #### Functions
 
 #### Triggers
+
+#### Connectors

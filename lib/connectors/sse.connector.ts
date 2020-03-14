@@ -1,5 +1,6 @@
 /**
  * SSEConnector
+ *  * Allows send notification to the client with SSE
  */
 const { PassThrough } = require("stream");
 
@@ -21,7 +22,7 @@ export class SSEConnector {
 
     /**
      * Send message to the client
-     * Use this function for subscription
+     * Can be used as a callback for subscription
      * @param payload: string - message for client
      * @param channel: string - event channel, not required
      */
