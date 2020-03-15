@@ -1,16 +1,17 @@
 /**
  * Triggers for Postgres
  */
-import { ITrigger } from "@pack-types/index";
+import { ITrigger, ITriggerOptions } from "@pack-types/index";
 import { isArray } from "lodash";
+import uuid from "uuid";
 
 export class Triggers {
-    public static afterAll(schema: string, table: string, columns: string | string[] = ""): ITrigger {
+    public static afterAll(schema: string, table: string, columns: string | string[] = "", options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         const cols = isArray(columns) ? columns.join(", ") : columns;
         return {
-            name: `${name}_after_all`,
+            name: `${name}_after_all${options ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_after_all ON ${path};
                 CREATE TRIGGER ${name}_after_all AFTER INSERT OR UPDATE OR DELETE ${cols} ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_after_all_notifier();

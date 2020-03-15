@@ -35,3 +35,5 @@ const subscriptionClient = new SubscriptionClient(<client options>);
 #### Triggers
 
 #### Connectors
+
+new SSEConnector(ctx.response).initStream().send('start');

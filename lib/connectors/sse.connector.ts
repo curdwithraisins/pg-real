@@ -5,19 +5,21 @@
 const { PassThrough } = require("stream");
 
 export class SSEConnector {
-    private res: any;
+    public res: any;
 
     constructor(res: any) {
         this.res = res;
     }
 
     public initStream() {
-        this.res.status(200);
-        this.res.setHeader("Content-Type", "text/event-stream;charset=utf-8");
-        this.res.setHeader("Access-Control-Allow-Origin", "*");
-        this.res.setHeader("Cache-Control", "no-cache");
-        this.res.body = PassThrough.create();
-        return this.res.body;
+        typeof this.res.status === "function" ? this.res.status(200) : this.res.status = 200;
+        this.res.set({
+            "Content-Type": "text/event-stream;charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-cache",
+        });
+        this.res.body = new PassThrough();
+        return this;
     }
 
     /**
@@ -31,5 +33,6 @@ export class SSEConnector {
             this.res.body.write(`event: ${channel}\n`);
         }
         this.res.body.write(`data: ${payload}\n\n`);
+        return this;
     }
 }

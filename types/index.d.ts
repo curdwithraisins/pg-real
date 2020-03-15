@@ -4,6 +4,10 @@
 import { Client } from 'pg';
 import { PassThrough } from 'stream';
 
+export interface ITriggerOptions {
+    unique: boolean
+}
+
 export interface ITrigger {
     trigger: string,
     name: string,
