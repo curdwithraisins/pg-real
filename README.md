@@ -36,4 +36,33 @@ const subscriptionClient = new SubscriptionClient(<client options>);
 
 #### Connectors
 
-new SSEConnector(ctx.response).initStream().send('start');
+Notifications from Postgres could be sent with HTTP/HTTPS, SSE or WebSockets. You can create your own connection or use one of the supplied classes.
+
+##### HTTP/HTTPS
+
+
+
+##### SSE
+
+Use **SSEConnector** to create new SSE connection. Response object should be supplied as an input parameter. 
+
+**Note:** Supports Express and Koa.
+
+Values:
+* **res** - response object;
+
+Methods:
+* **initStream** - sets status(200), headers and creates stream;
+* **send**: **<payload: string, channel: string>** - sends message to the stream. Channel is an optional.
+
+**Example:**
+````
+1) new SSEConnector(ctx.response).initStream().send('start');
+
+2) new SSEConnector(ctx.response).initStream().send('start', 'after_insert_users');
+
+3) new SSEConnector(ctx.response).initStream().res.body.write('data: start');
+````
+
+##### WebSockets
+
