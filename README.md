@@ -34,6 +34,33 @@ const subscriptionClient = new SubscriptionClient(<client options>);
 
 #### Triggers
 
+As per Postgres documentation:
+````
+PL/pgSQL can be used to define trigger functions on data changes or database events. A trigger function is created with the CREATE FUNCTION command, declaring it as a function with no arguments and a return type of trigger (for data change triggers) or event_trigger (for database event triggers).
+````
+For more information reference [an official documentation](https://www.postgresql.org/docs/12/plpgsql-trigger.html).
+
+pg-real uses triggers to subscribe on database changes. User can both specify own functions or use predefined general methods. 
+
+For predefined triggers database schema and table name are required. Columns names are optional and could be used for more accuracy. Trigger generators also take options parameters.
+
+The list of trigger generators:
+* **afterAll**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after any change on the table or column if defined;
+* **beforeAll**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before any change on the table or column if defined;
+* **afterInsert**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after insert to the table;
+* **beforeInsert**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before insert to the table;
+* **afterUpdate**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after update on the table or column if defined;
+* **beforeUpdate**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before any change on the table or column if defined;
+* **afterDelete**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after delete on the table or column if defined;
+* **beforeDelete**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before delete on the table or column if defined;
+
+where options could be:
+* **unique**: boolean - create a unique trigger name.
+
+###### Why uniques is important?
+
+When we want to subscribe a client to a specific event based on the client specific data (id, filter, etc.) and we want to be triggered only for him, but we've already have a trigger on the same table we need to specify a unique trigger to not override an existent one. 
+
 #### Connectors
 
 Notifications from Postgres could be sent with HTTP/HTTPS, SSE or WebSockets. You can create your own connection or use one of the supplied classes.
