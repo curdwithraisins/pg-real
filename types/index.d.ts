@@ -4,8 +4,13 @@
 import { Client } from 'pg';
 import { PassThrough } from 'stream';
 
+export interface ITriggerPath {
+    schema: string,
+    table: string,
+}
+
 export interface ITriggerOptions {
-    unique: boolean
+    unique: boolean,
 }
 
 export interface ITrigger {

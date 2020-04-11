@@ -1,17 +1,17 @@
 /**
  * Triggers for Postgres
  */
-import { ITrigger, ITriggerOptions } from "@pack-types/index";
+import { ITrigger, ITriggerPath, ITriggerOptions } from "@pack-types/index";
 import { isArray } from "lodash";
-import uuid from "uuid";
+import * as uuid from "uuid";
 
 export class Triggers {
-    public static afterAll(schema: string, table: string, columns: string | string[] = "", options: ITriggerOptions): ITrigger {
+    public static afterAll({schema = 'public', table}: ITriggerPath, columns: string | string[] = "", options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         const cols = isArray(columns) ? columns.join(", ") : columns;
         return {
-            name: `${name}_after_all${options ? "_" + uuid() : ''}`,
+            name: `${name}_after_all${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_after_all ON ${path};
                 CREATE TRIGGER ${name}_after_all AFTER INSERT OR UPDATE OR DELETE ${cols} ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_after_all_notifier();
@@ -19,11 +19,11 @@ export class Triggers {
         };
     }
 
-    public static beforeAll(schema: string, table: string): ITrigger {
+    public static beforeAll({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_before_all`,
+            name: `${name}_before_all${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_before_all ON ${path};
                 CREATE TRIGGER ${name}_before_all BEFORE INSERT OR UPDATE OR DELETE ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_before_all_notifier();
@@ -31,11 +31,11 @@ export class Triggers {
         };
     }
 
-    public static afterInsert(schema: string, table: string): ITrigger {
+    public static afterInsert({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_after_insert`,
+            name: `${name}_after_insert${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_after_insert ON ${path};
                 CREATE TRIGGER ${name}_after_insert AFTER INSERT ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_after_insert_notifier();
@@ -43,11 +43,11 @@ export class Triggers {
         };
     }
 
-    public static beforeInsert(schema: string, table: string): ITrigger {
+    public static beforeInsert({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_before_insert`,
+            name: `${name}_before_insert${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_before_insert ON ${path};
                 CREATE TRIGGER ${name}_before_insert BEFORE INSERT ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_before_insert_notifier();
@@ -55,11 +55,11 @@ export class Triggers {
         };
     }
 
-    public static afterUpdate(schema: string, table: string): ITrigger {
+    public static afterUpdate({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_after_update`,
+            name: `${name}_after_update${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_after_update ON ${path};
                 CREATE TRIGGER ${name}_after_update AFTER UPDATE ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_after_update_notifier();
@@ -67,11 +67,11 @@ export class Triggers {
         };
     }
 
-    public static beforeUpdate(schema: string, table: string): ITrigger {
+    public static beforeUpdate({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_before_update`,
+            name: `${name}_before_update${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_before_update ON ${path};
                 CREATE TRIGGER ${name}_before_update BEFORE UPDATE ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_before_update_notifier();
@@ -79,11 +79,11 @@ export class Triggers {
         };
     }
 
-    public static afterDelete(schema: string, table: string): ITrigger {
+    public static afterDelete({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_after_delete`,
+            name: `${name}_after_delete${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_after_delete ON ${path};
                 CREATE TRIGGER ${name}_after_delete AFTER DELETE ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_after_delete_notifier();
@@ -91,11 +91,11 @@ export class Triggers {
         };
     }
 
-    public static beforeDelete(schema: string, table: string): ITrigger {
+    public static beforeDelete({schema = 'public', table}: ITriggerPath, options: ITriggerOptions): ITrigger {
         const name = schema + "_" + table;
         const path = schema + "." + table;
         return {
-            name: `${name}_before_delete`,
+            name: `${name}_before_delete${options.unique ? "_" + uuid() : ''}`,
             trigger: `
                 DROP TRIGGER IF EXISTS ${name}_before_delete ON ${path};
                 CREATE TRIGGER ${name}_before_delete BEFORE DELETE ON ${path} FOR EACH ROW EXECUTE PROCEDURE ${name}_before_delete_notifier();

@@ -32,6 +32,14 @@ const subscriptionClient = new SubscriptionClient(<client options>);
 
 #### Functions
 
+As per Postgres documentation:
+````
+PostgreSQL provides these helper functions to retrieve information from event triggers.
+````
+For more information reference [an official documentation](https://www.postgresql.org/docs/12/functions-event-triggers.html).
+
+The functions handle events from Postgres based on the preconfitions 
+
 #### Triggers
 
 As per Postgres documentation:
