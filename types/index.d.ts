@@ -7,6 +7,7 @@ import { PassThrough } from 'stream';
 export interface ITriggerPath {
     schema: string,
     table: string,
+    columns: string | string[],
 }
 
 export interface ITriggerOptions {

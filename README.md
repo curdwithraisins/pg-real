@@ -48,9 +48,9 @@ PL/pgSQL can be used to define trigger functions on data changes or database eve
 ````
 For more information reference [an official documentation](https://www.postgresql.org/docs/12/plpgsql-trigger.html).
 
-pg-real uses triggers to subscribe on database changes. User can both specify own functions or use predefined general methods. 
+pg-real uses triggers to subscribe to the database changes. User can both specify own functions or use predefined general methods. 
 
-For predefined triggers database schema and table name are required. Columns names are optional and could be used for more accuracy. Trigger generators also take options parameters.
+For predefined triggers database table name is required. You also can set schema path, 'public' schema is used by default. Columns names are optional and could be used for more accuracy. Trigger generators also take options parameters.
 
 The list of trigger generators:
 * **afterAll**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after any change on the table or column if defined;
