@@ -9,7 +9,7 @@ A simple package to notify clients about Postgres updates in real-time through H
 
 ##### Connection
 
-The central part of the packet is PostgreSQL. We need to have a connection to the DB. To instantiate new connection, use [pg](https://github.com/brianc/node-postgres) module or create connection with the **SubClient** class. THis class instantiate Client class of the **pg** module with an additional functionality for functions declaration:
+The central part of the packet is PostgreSQL. We need to have a connection to the DB. To instantiate new connection use **SubClient** class. THis class instantiate Client class of the **pg** module with an additional functionality for functions declaration:
 ```
 const connectionString = `postgres://${user}:${password}@${host}:${port}}/${database}`;
 
@@ -19,6 +19,27 @@ this.client.connect().then(console.log(`Connected to ${connectionString}`));
 ```
 
 With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notification and also specify functions with should be triggered on the event.
+
+##### Subscriber
+
+To manage subscriptions use Subscriber class. This class takes SubClient and use it to connect to the PostgreSQL.
+
+````
+const subscriber = new Subscriber(client);
+````
+
+This class sets notifier function for listener and send message to the listener based on the channel name. 
+
+> Channel name of the listener should correspond to the channel name of the function.
+
+To start listen to the events call **startListen** function with the list of the channels:
+
+```
+subscriber.startListen("channel_1"); // start listen to one channel
+subscriber.startListen(["channel_1", "channel_2"]); // start listen to several channels
+
+```
+
 
 
 ##### Response
