@@ -1,13 +1,13 @@
 # pg-real
 A simple package to notify clients about Postgres updates in real-time through HTTP/SSE/WebSockets connection.
 
-### Installation
+## Installation
 
 ```npm install pg-real```
 
-### Usage
+## Usage
 
-##### Connection
+#### Connection
 
 The central part of the packet is PostgreSQL. We need to have a connection to the DB. To instantiate new connection use **SubClient** class. THis class instantiate Client class of the **pg** module with an additional functionality for functions declaration:
 ```
@@ -20,24 +20,16 @@ this.client.connect().then(console.log(`Connected to ${connectionString}`));
 
 With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notification and also specify functions with should be triggered on the event.
 
-##### Response
+#### Response
 
 To send response to the client on the event occurrence choose and create one of the connectors:
-
-* HTTP
 ```
 new HttpConnector(ctx.response);
-```
-* SSE
-```
 new SSEConnector(ctx.response);
-```
-* WebSocket
-```
 new SocketConnector(ctx.response);
 ```
 
-##### Subscriber
+#### Subscriber
 
 To manage subscriptions use Subscriber class. This class takes SubClient and use it to connect to the PostgreSQL.
 
@@ -76,7 +68,7 @@ subscriber.stoptListen(); // stop listen to all channels
 ```
 
 
-#### Client
+### Client
 
 A Postgres Client is a basic thing we need for notifier. We recommend you to use our **SubscriptionClient** from this lib but you an also use your own client.
 
@@ -99,7 +91,7 @@ import { SubscriptionClient } from 'pg-real';
 const subscriptionClient = new SubscriptionClient(<client options>);
 ```
 
-#### Functions
+### Functions
 
 As per Postgres documentation:
 ````
@@ -109,7 +101,7 @@ For more information reference [an official documentation](https://www.postgresq
 
 The functions handle events from Postgres based on the preconfitions 
 
-#### Triggers
+### Triggers
 
 As per Postgres documentation:
 ````
@@ -134,19 +126,32 @@ The list of trigger generators:
 where options could be:
 * **unique**: boolean - create a unique trigger name.
 
-###### Why uniques is important?
+##### Why uniques is important?
 
 When we want to subscribe a client to a specific event based on the client specific data (id, filter, etc.) and we want to be triggered only for him, but we've already have a trigger on the same table we need to specify a unique trigger to not override an existent one. 
 
-#### Connectors
+### Connectors
 
 Notifications from Postgres could be sent with HTTP/HTTPS, SSE or WebSockets. You can create your own connection or use one of the supplied classes.
 
-##### HTTP/HTTPS
+#### HTTP/HTTPS
 
+Use **HttpConnector** to create new HTTP connection. Response object should be supplied as an input parameter. 
 
+Values:
+* **res** - response object;
 
-##### SSE
+Methods:
+* **send**: **<payload: string, channel: string>** - sends message to the user. Channel is an optional.
+
+**Example:**
+````
+1) new HttpConnector(ctx.response).send('start');
+
+2) new HttpConnector(ctx.response).send('start', 'after_insert_users');
+````
+
+#### SSE
 
 Use **SSEConnector** to create new SSE connection. Response object should be supplied as an input parameter. 
 
@@ -164,9 +169,23 @@ Methods:
 1) new SSEConnector(ctx.response).initStream().send('start');
 
 2) new SSEConnector(ctx.response).initStream().send('start', 'after_insert_users');
-
-3) new SSEConnector(ctx.response).initStream().res.body.write('data: start');
 ````
 
-##### WebSockets
+#### WebSockets
 
+Use **SocketConnector** to create new WebSocket connection. Socket object should be supplied as an input parameter. 
+
+**Note:** Supports Express and Koa.
+
+Values:
+* **socket** - socket object;
+
+Methods:
+* **send**: **<payload: string, channel: string>** - sends message to the socket. Channel is an optional.
+
+**Example:**
+````
+1) new SocketConnector(socket).send('start');
+
+2) new SocketConnector(socket).send('start', 'after_insert_users');
+````
