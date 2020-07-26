@@ -33,7 +33,9 @@ export class Subscriber {
         }
         await this.client.setListeners(channelsKeys);
         channelsKeys.forEach((key) => {
-            this.listeners[key] = {};
+            if (!this.listeners[key]) {
+                this.listeners[key] = {};
+            }
         });
         return this;
     }
