@@ -11,11 +11,11 @@ A simple package to notify clients about Postgres updates in real-time through H
 * [Client](#client)
 * [Functions](#functions)
 * [Triggers](#triggers)
-    * [Why uniques is important?](#why uniques is important?)
+    * [Why uniques is important?](#why-uniques-is-important)
 * [Connectors](#connectors)
-    * [HTTP/HTTPS](#HTTP/HTTPS)
+    * [HTTP/HTTPS](#httphttps)
     * [SSE](#sse)
-    * [WebSockets](#webSockets)
+    * [WebSockets](#websockets)
     
 ## Installation
 
