@@ -20,44 +20,6 @@ export class Subscriber {
     }
 
     /**
-     * Start listen to channels
-     * @param channels: string | string[]
-     */
-    public async startListen(channels: string | string[]) {
-        if (!channels || !channels.length) {
-            throw Error("Provide channels names to start listen to.");
-        }
-        let channelsKeys = cloneDeep(channels);
-        if (!isArray(channelsKeys)) {
-            channelsKeys = [channelsKeys];
-        }
-        await this.client.setListeners(channelsKeys);
-        channelsKeys.forEach((key) => {
-            if (!this.listeners[key]) {
-                this.listeners[key] = {};
-            }
-        });
-        return this;
-    }
-
-    /**
-     * Stop listen to one, several or all channels and notify when one of those events occurs
-     * @param channels: string | string[] - channel name or list of names
-     */
-    public async stopListen(channels: string | string[] = null) {
-        let channelsKeys = cloneDeep(channels);
-        channelsKeys = channelsKeys || keys(this.listeners);
-        if (!isArray(channelsKeys)) {
-            channelsKeys = [channelsKeys];
-        }
-        await this.client.removeListeners(channelsKeys);
-        channelsKeys.forEach((key) => {
-            delete this.listeners[key];
-        });
-        return this;
-    }
-
-    /**
      * Subscribe to channel and set a corresponding callback
      * @param channel: string | string[]  - channel name of list of names
      * @param cb: Function | PassThrough - callback function or stream
@@ -113,6 +75,44 @@ export class Subscriber {
                     delete this.listeners[channel][cb];
                 }
             });
+        });
+        return this;
+    }
+
+    /**
+     * Start listen to channels
+     * @param channels: string | string[]
+     */
+    public async startListen(channels: string | string[]) {
+        if (!channels || !channels.length) {
+            throw Error("Provide channels names to start listen to.");
+        }
+        let channelsKeys = cloneDeep(channels);
+        if (!isArray(channelsKeys)) {
+            channelsKeys = [channelsKeys];
+        }
+        await this.client.setListeners(channelsKeys);
+        channelsKeys.forEach((key) => {
+            if (!this.listeners[key]) {
+                this.listeners[key] = {};
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Stop listen to one, several or all channels and notify when one of those events occurs
+     * @param channels: string | string[] - channel name or list of names
+     */
+    public async stopListen(channels: string | string[] = null) {
+        let channelsKeys = cloneDeep(channels);
+        channelsKeys = channelsKeys || keys(this.listeners);
+        if (!isArray(channelsKeys)) {
+            channelsKeys = [channelsKeys];
+        }
+        await this.client.removeListeners(channelsKeys);
+        channelsKeys.forEach((key) => {
+            delete this.listeners[key];
         });
         return this;
     }

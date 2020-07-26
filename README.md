@@ -20,28 +20,6 @@ this.client.connect().then(console.log(`Connected to ${connectionString}`));
 
 With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notification and also specify functions with should be triggered on the event.
 
-##### Subscriber
-
-To manage subscriptions use Subscriber class. This class takes SubClient and use it to connect to the PostgreSQL.
-
-````
-const subscriber = new Subscriber(client);
-````
-
-This class sets notifier function for listener and send message to the listener based on the channel name. 
-
-> Channel name of the listener should correspond to the channel name of the function.
-
-To start listen to the events call **startListen** function with the list of the channels:
-
-```
-subscriber.startListen("channel_1"); // start listen to one channel
-subscriber.startListen(["channel_1", "channel_2"]); // start listen to several channels
-
-```
-
-
-
 ##### Response
 
 To send response to the client on the event occurrence choose and create one of the connectors:
@@ -58,6 +36,45 @@ new SSEConnector(ctx.response);
 ```
 new SocketConnector(ctx.response);
 ```
+
+##### Subscriber
+
+To manage subscriptions use Subscriber class. This class takes SubClient and use it to connect to the PostgreSQL.
+
+````
+const subscriber = new Subscriber(client);
+````
+
+First, we need to subscribe to the events. Use **subscribe** function to link channel and corresponding receiver. If a list of channels are specified the corresponding receiver will be linked to the all of them. Receiver could be:
+* function;
+* stream;
+* the send method of one of the [connectors](#connection).
+
+```
+subscriber.subscribe("channel_1", (channel, payload) => { console.log(channel, payload); });
+subscriber.subscribe("channel_2", new PassThrough());
+subscriber.subscribe(["channel_1", "channel_2"], connector.send);
+```
+
+This class sets notifier function for listener and send message to the listener based on the channel name. 
+
+> Channel name of the listener should correspond to the channel name of the function.
+
+To start listen to the events call **startListen** function with the list of the channels:
+
+```
+subscriber.startListen("channel_1"); // start listen to one channel
+subscriber.startListen(["channel_1", "channel_2"]); // start listen to several channels
+```
+
+To stop listen to the events call **stopListen** function with the list of the channels. If no channels are specified, all listeners are unsubscribed:
+
+```
+subscriber.stopListen("channel_1"); // stop listen to one channel
+subscriber.stoptListen(["channel_1", "channel_2"]); // stop listen to several channels
+subscriber.stoptListen(); // stop listen to all channels
+```
+
 
 #### Client
 
