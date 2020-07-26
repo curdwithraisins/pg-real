@@ -1,6 +1,22 @@
 # pg-real
 A simple package to notify clients about Postgres updates in real-time through HTTP/SSE/WebSockets connection.
 
+## Table of Content
+
+* [Installation](#installation)
+* [Usage](#usage)
+    * [Connection](#connection)
+    * [Response](#response)
+    * [Subscriber](#subscriber)
+* [Client](#client)
+* [Functions](#functions)
+* [Triggers](#triggers)
+    * [Why uniques is important?](#why uniques is important?)
+* [Connectors](#connectors)
+    * [HTTP/HTTPS](#HTTP/HTTPS)
+    * [SSE](#sse)
+    * [WebSockets](#webSockets)
+    
 ## Installation
 
 ```npm install pg-real```
