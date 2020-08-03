@@ -20,6 +20,7 @@ export interface ITrigger {
 }
 
 export interface IFunction {
+    name: string,
     function: string,
     channel: string,
 }

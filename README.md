@@ -1,5 +1,7 @@
 # pg-real
-A simple package to notify clients about Postgres updates in real-time through HTTP/SSE/WebSockets connection.
+A simple module which helps to manage a pub/sub behavior with the PostgreSQL updates in the real-time through HTTP/SSE/WebSockets connection.
+
+> **Note**: this lib is currently compatible only with a Postgres client from [node-postgres](https://github.com/brianc/node-postgres). If you use any other client this lib isn't suitable for you.
 
 ## Table of Content
 
@@ -25,21 +27,16 @@ A simple package to notify clients about Postgres updates in real-time through H
 
 ### Connection
 
-The central part of the packet is PostgreSQL. We need to have a connection to the DB. To instantiate new connection use **SubClient** class. THis class instantiate Client class of the **pg** module with an additional functionality for functions declaration:
-```
-const connectionString = `postgres://${user}:${password}@${host}:${port}}/${database}`;
+This module supports only PostgreSQL. 
 
-const client = new SubClient(connectionString);
+To create connection to the db use **SubClient** class. It inherits **pg** module's Client class with an additional functionality for Functions and Triggers declaration:
 
-this.client.connect().then(console.log(`Connected to ${connectionString}`));
-```
-
-With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notification and also specify functions with should be triggered on the event.
+With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notifications and also specify functions with should be triggered on the specific events.
 
 ### Response
 
 To send response to the client on the event occurrence choose and create one of the connectors:
-```
+```javascript
 new HttpConnector(ctx.response);
 new SSEConnector(ctx.response);
 new SocketConnector(ctx.response);
@@ -47,19 +44,22 @@ new SocketConnector(ctx.response);
 
 ### Subscriber
 
-To manage subscriptions use Subscriber class. This class takes SubClient and use it to connect to the PostgreSQL.
+To manage subscriptions use **Subscriber** class. This class takes **SubClient** instance as an input parameter and use it to connect to the PostgreSQL.
 
-````
+````javascript
 const subscriber = new Subscriber(client);
 ````
 
-First, we need to subscribe to the events. Use **subscribe** function to link channel and corresponding receiver. If a list of channels are specified the corresponding receiver will be linked to the all of them. Receiver could be:
+**SubClient** includes several useful methods:
+
+To subscribe to the events use **subscribe** function to link channel and corresponding receiver. If a list of channels aren't specified the corresponding receiver will be linked to all of them. Receiver could be:
 * function;
 * stream;
 * the send method of one of the [connectors](#connection).
 
-```
-subscriber.subscribe("channel_1", (channel, payload) => { console.log(channel, payload); });
+```javascript
+const fn = (channel, payload) => { console.log(channel, payload); };
+subscriber.subscribe("channel_1", fn);
 subscriber.subscribe("channel_2", new PassThrough());
 subscriber.subscribe(["channel_1", "channel_2"], connector.send);
 ```
@@ -68,43 +68,78 @@ This class sets notifier function for listener and send message to the listener 
 
 > Channel name of the listener should correspond to the channel name of the function.
 
-To start listen to the events call **startListen** function with the list of the channels:
+To start listen to the events call **startListen** with the list of the channels:
 
-```
-subscriber.startListen("channel_1"); // start listen to one channel
-subscriber.startListen(["channel_1", "channel_2"]); // start listen to several channels
-```
-
-To stop listen to the events call **stopListen** function with the list of the channels. If no channels are specified, all listeners are unsubscribed:
-
-```
-subscriber.stopListen("channel_1"); // stop listen to one channel
-subscriber.stoptListen(["channel_1", "channel_2"]); // stop listen to several channels
-subscriber.stoptListen(); // stop listen to all channels
+```javascript
+subscriber.startListen("channel_1");
+subscriber.startListen(["channel_1", "channel_2"]);
 ```
 
+To stop listen to the events call **stopListen**  with the list of the channels. If no channels are specified, all listeners are unsubscribed:
+
+```javascript
+subscriber.stopListen("channel_1");
+subscriber.stoptListen(["channel_1", "channel_2"]);
+subscriber.stoptListen();
+```
 
 ## Client
 
-A Postgres Client is a basic thing we need for notifier. We recommend you to use our **SubscriptionClient** from this lib but you an also use your own client.
-
-> **Note**: this lib is currently compatible only with a Postgres client from [node-postgres](https://github.com/brianc/node-postgres). If you use aby other client this lib isn't suitable for you.
-
-**SubscriptionClient** includes several useful methods:
-* **setFunctions**:*string | string[]* - takes query to create a function (go to [Functions](#functions) section to get more info);
-* **dropFunctions**:*string | string[]* - takes function name and drop it;
-* **setTrigger**:*string | string[]* - takes query to create a trigger (go to [Triggers](#triggers) section to get more info);
-* **removeTriggers**:*string | string[]* - takes trigger name and drop it, Require schema and table name;
-* **setListeners**:*string | string[]* - take channel name and activate listening;
-* **removeListeners**:*string | string[]* - take channel name and stop listening;
-* **setTriggersAndListeners**:*ITrigger | ITrigger[]* - takes linked triggers and listeners, create triggers and start listening on them;
-* **startListen**:*any* - takes function, connection etc and send notification from Postgres to it when it occurs.
-
-**SubscriptionClient** extends basic [node-postgres](https://github.com/brianc/node-postgres) client. It takes all the same parameters and doesn't override any of its methods. Refers original documentation to get more information about this library.
+A PostgreSQL Client is a basic thing we need for notifier. We recommend to use our **SubClient** from this lib but you also can use your own client.
 
 ```javascript
-import { SubscriptionClient } from 'pg-real';
-const subscriptionClient = new SubscriptionClient(<client options>);
+const connectionString = `postgres://${user}:${password}@${host}:${port}}/${database}`;
+const client = new SubClient(connectionString);
+this.client.connect().then(console.log(`Connected to ${connectionString}`));
+```
+
+**SubClient** includes several useful methods:
+* **setFunctions**:*string | string[]* - takes query to create a function (go to [Functions](#functions) section to get more info);
+
+```javascript
+const { function } = Functions.afterAll('public', 'test');
+client.setFunctions(function);
+```
+
+* **dropFunctions**:*string | string[]* - takes function name and drop it;
+
+```javascript
+const { name } = Functions.afterAll('public', 'test');
+client.dropFunctions(name);
+```
+
+* **setTrigger**:*string | string[]* - takes query to create a trigger (go to [Triggers](#triggers) section to get more info);
+
+```javascript
+const { trigger } = Triggers.afterAll({
+   schema: 'public', 
+   table: 'test' 
+});
+client.setTrigger(trigger);
+```
+
+* **removeTriggers**:*string | string[]* - takes trigger name and drop it, Require schema and table name;
+
+```javascript
+const { name } = Triggers.afterAll({
+   schema: 'public', 
+   table: 'test' 
+});
+client.removeTriggers(name, 'public', 'test');
+```
+
+* **setListeners**:*string | string[]* - take channel name and activate listening;
+
+```javascript
+const { channel } = Functions.afterAll('public', 'test');
+client.setListeners(channel);
+```
+
+* **removeListeners**:*string | string[]* - take channel name and stop listening;
+
+```javascript
+const { channel } = Functions.afterAll('public', 'test');
+client.removeListeners(channel);
 ```
 
 ## Functions

@@ -7,6 +7,7 @@ export class Functions {
     public static afterAll(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_after_all_notifier`,
             channel: `${name}_after_all`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_all_notifier() RETURNS TRIGGER AS $$
@@ -28,6 +29,7 @@ export class Functions {
     public static beforeAll(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_before_all_notifier`,
             channel: `${name}_before_all`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_all_notifier() RETURNS TRIGGER AS $$
@@ -49,6 +51,7 @@ export class Functions {
     public static afterInsert(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_after_insert_notifier`,
             channel: `${name}_after_insert`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_insert_notifier() RETURNS TRIGGER AS $$
@@ -66,6 +69,7 @@ export class Functions {
     public static beforeInsert(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_before_insert_notifier`,
             channel: `${name}_before_insert`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_insert_notifier() RETURNS TRIGGER AS $$
@@ -83,6 +87,7 @@ export class Functions {
     public static afterUpdate(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_after_update_notifier`,
             channel: `${name}_after_update`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_update_notifier() RETURNS TRIGGER AS $$
@@ -100,6 +105,7 @@ export class Functions {
     public static beforeUpdate(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_before_update_notifier`,
             channel: `${name}_before_update`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_update_notifier() RETURNS TRIGGER AS $$
@@ -117,6 +123,7 @@ export class Functions {
     public static afterDelete(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_after_delete_notifier`,
             channel: `${name}_after_delete`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_after_delete_notifier() RETURNS TRIGGER AS $$
@@ -134,6 +141,7 @@ export class Functions {
     public static beforeDelete(schema: string, table: string): IFunction {
         const name = schema + "_" + table;
         return {
+            name: `${name}_before_delete_notifier`,
             channel: `${name}_before_delete`,
             function: `
                 CREATE OR REPLACE FUNCTION ${name}_before_delete_notifier() RETURNS TRIGGER AS $$
