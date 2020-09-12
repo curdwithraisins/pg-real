@@ -20,6 +20,9 @@ export class HttpConnector {
         this.res.status(200);
         this.res.setHeader("Access-Control-Allow-Origin", "*");
         this.res.setHeader("Cache-Control", "no-cache");
-        return `${channel ? "event: " + channel + "; " : ""}data: ${payload}`;
+        if (channel) {
+            [channel, payload] = [payload, channel];
+        }
+        return `${channel ? "event: " + channel + "; data: " : ""}${payload}`;
     }
 }

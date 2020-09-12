@@ -17,6 +17,9 @@ export class SocketConnector {
      * @param channel: string - event channel, not required
      */
     public send(payload: string = "", channel: string = null) {
-        this.socket.emit(`${channel ? "event: " + channel + "; " : ""}data: ${payload}`);
+        if (channel) {
+            [channel, payload] = [payload, channel];
+        }
+        this.socket.emit(`${channel ? "event: " + channel + "; data: " : ""}${payload}`);
     }
 }
