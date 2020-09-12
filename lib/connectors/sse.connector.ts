@@ -30,6 +30,7 @@ export class SSEConnector {
      */
     public send(payload: string = "", channel: string = null) {
         if (channel) {
+            [channel, payload] = [payload, channel];
             this.res.body.write(`event: ${channel}\n`);
         }
         this.res.body.write(`data: ${payload}\n\n`);

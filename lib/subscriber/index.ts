@@ -110,7 +110,7 @@ export class Subscriber {
         if (!isArray(channelsKeys)) {
             channelsKeys = [channelsKeys];
         }
-        await this.client.removeListeners(channelsKeys);
+        await this.client.dropListeners(channelsKeys);
         channelsKeys.forEach((key) => {
             delete this.listeners[key];
         });
@@ -118,9 +118,9 @@ export class Subscriber {
     }
 }
 
-const notify = (data: any) => {
+function notify(data: any) {
     const {channel, payload} = data;
-    values(this.listeners[channel]).forEach((cb: Function | PassThrough) => {
+    values(this.listeners[channel]).forEach(function(cb: Function | PassThrough) {
         if (typeof cb === "function") {
             cb(channel, payload);
         } else {
@@ -128,4 +128,4 @@ const notify = (data: any) => {
             cb.write(`data: ${payload}\n\n`);
         }
     });
-};
+}

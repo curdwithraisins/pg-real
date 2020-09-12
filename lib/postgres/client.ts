@@ -46,12 +46,12 @@ export class SubClient extends Client implements ISubClient {
     }
 
     /**
-     * Remove trigger
+     * Drop trigger
      * @param triggersNames: string | string[] - trigger name or list of names
      * @param schema: string - schema name
      * @param table: string - table name
      */
-    public async removeTriggers(triggersNames: string | string[], schema: string, table: string) {
+    public async dropTriggers(triggersNames: string | string[], schema: string, table: string) {
         if (!schema || !table) {
             return new Error("Require schema and table.");
         }
@@ -77,10 +77,10 @@ export class SubClient extends Client implements ISubClient {
     }
 
     /**
-     * Remove listener and stop notification process for it
+     * Drop listener and stop notification process for it
      * @param channels: string | string[] - channel or list of channels
      */
-    public async removeListeners(channels: string | string[]) {
+    public async dropListeners(channels: string | string[]) {
         let list = cloneDeep(channels);
         if (!isArray(list)) {
             list = [list];

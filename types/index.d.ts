@@ -7,11 +7,17 @@ import { PassThrough } from 'stream';
 export interface ITriggerPath {
     schema: string,
     table: string,
-    columns: string | string[],
+    columns?: string[],
+    triggerName?: string,
 }
 
 export interface ITriggerOptions {
-    unique: boolean,
+    unique?: boolean,
+    when?: boolean,
+    before?: boolean,
+    insert?: boolean,
+    update?: boolean,
+    delete?: boolean,
 }
 
 export interface ITrigger {
@@ -29,9 +35,9 @@ export interface ISubClient extends Client {
     setFunctions(funcs: string | string[]): Promise<this | Error>,
     dropFunctions(funcsName: string | string[]): Promise<this | Error>,
     setTriggers(triggers: string | string[]): Promise<this | Error>,
-    removeTriggers(triggersNames: string | string[], schema: string, table: string): Promise<this | Error>,
+    dropTriggers(triggersNames: string | string[], schema: string, table: string): Promise<this | Error>,
     setListeners(channels: string | string[]): Promise<this | Error>,
-    removeListeners(channels: string | string[]): Promise<this | Error>,
+    dropListeners(channels: string | string[]): Promise<this | Error>,
     setNotifier(any): void,
 }
 

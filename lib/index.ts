@@ -1,3 +1,4 @@
+export * from "pg";
 export * from "./subscriber";
 export * from "./connectors/http.connector";
 export * from "./connectors/sse.connector";
