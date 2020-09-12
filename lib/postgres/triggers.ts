@@ -8,13 +8,13 @@ import * as uuid from "uuid";
 export class Triggers {
     public static custom(
             { schema = 'public', table, columns = [], triggerName = '' }: ITriggerPath,
-            { unique, when, before, delete: d, insert: i, update: u }: ITriggerOptions = {}
+            { unique, when, before = false, insert: i, update: u, delete: d }: ITriggerOptions = {}
         ): ITrigger | Error {
         if (!table) return new Error('Table name should be defined.');
         const name = triggerName || schema + "_" + table + (columns.length ? "_" + columns.join('_') : '') + (unique ? "_" + uuid() : '');
         const path = schema + "." + table;
         const cols = columns.join(", ");
-        const event = [i && 'INSERT', u && ('UPDATE' + (cols ? ' OF ' + cols : '')), d && 'DELETE'].filter(Boolean).join(' OR ');
+        const event = [i && 'INSERT', u && ('UPDATE' + (cols ? ' OF ' + cols : '')), d && 'DELETE'].filter(Boolean).join(' OR ') || 'UPDATE';
         return {
             name,
             trigger: `

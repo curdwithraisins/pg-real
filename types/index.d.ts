@@ -13,7 +13,7 @@ export interface ITriggerPath {
 
 export interface ITriggerOptions {
     unique?: boolean,
-    when?: boolean,
+    when?: string,
     before?: boolean,
     insert?: boolean,
     update?: boolean,

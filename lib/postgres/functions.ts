@@ -12,11 +12,11 @@ export class Functions {
                 CREATE OR REPLACE FUNCTION ${name}_notifier() RETURNS TRIGGER AS $$
                 BEGIN
                     IF TG_OP = 'INSERT' THEN
-                        PERFORM pg_notify(CAST('${name}" 'S text), TG_OP, row_to_json(NEW)::text);
+                        PERFORM pg_notify(CAST('${name}' AS text), row_to_json(NEW)::text);
                     ELSIF TG_OP = 'UPDATE' THEN
-                        PERFORM pg_notify(CAST('${name}" 'S text), TG_OP, row_to_json(NEW)::text);
+                        PERFORM pg_notify(CAST('${name}' AS text), row_to_json(NEW)::text);
                     ELSIF TG_OP = 'DELETE' THEN
-                        PERFORM pg_notify(CAST('${name}" 'S text), TG_OP, row_to_json(OLD)::text);
+                        PERFORM pg_notify(CAST('${name}' AS text), row_to_json(OLD)::text);
                     END IF;
                     RETURN NEW;
                 END;
