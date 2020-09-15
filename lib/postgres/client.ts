@@ -91,7 +91,7 @@ export class SubClient extends Client implements ISubClient {
 
     /**
      * Set function which will be triggered when event occurs
-     * Only one function can be set!
+     * NOTE: Only one function can be set!
      * @param notify: any - notification function
      */
     public setNotifier(notify: any) {

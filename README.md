@@ -9,7 +9,7 @@ A simple module which helps to manage a pub/sub behavior with the PostgreSQL upd
 * [Usage](#usage)
     * [Connection](#connection)
     * [Response](#response)
-    * [Subscriber](#subscriber)
+* [Subscriber](#subscriber)
 * [Client](#client)
 * [Functions](#functions)
 * [Triggers](#triggers)
@@ -21,17 +21,70 @@ A simple module which helps to manage a pub/sub behavior with the PostgreSQL upd
     
 ## Installation
 
-```npm install pg-real```
+To install package, use: ```npm install pg-real```.
 
 ## Usage
 
-### Connection
+### Initialization
 
-This module supports only PostgreSQL. 
+To establish a connection to the DB use **SubClient** class. It inherits Client class from [node-postgres](https://github.com/brianc/node-postgres) module with an additional functionality ti set **Functions**, **Triggers**, and **Listeners**.
 
-To create connection to the db use **SubClient** class. It inherits **pg** module's Client class with an additional functionality for Functions and Triggers declaration:
+Pass connection configuration to the class during instantiation to set desired settings. Review [node-postgres Client](https://node-postgres.com/api/client) documentation to get more information how to setup Postgres Client.
 
-With this class we can add and remove functions and triggers to subscribe and unsubscribe from the notifications and also specify functions with should be triggered on the specific events.
+**Example:**
+
+```javascript
+const { user, password, host, port, database } = config;
+const connectionString = `postgres://${user}:${password}@${host}:${port}/${database}`;
+const client = new SubClient(connectionString);
+client.connect();
+```
+
+### Set Functions and Triggers
+
+To create Function, use one of the predefined functions from the list of [functions](#functions) or create your own.
+
+**Note:** If you create your owm function, use a name of a notification channel to subscribe on the Postgres updates.
+
+**Example:**
+
+```javascript
+const customFunction = Functions.custom('test_channel_name');
+const afterAllFunction = Functions.afterAll('public', 'test');
+
+const own_channel_name = 'own_channel_name';
+const ownFunction = `
+   CREATE OR REPLACE FUNCTION ${own_channel_name}_notifier() RETURNS TRIGGER AS $$
+      BEGIN
+         IF TG_OP = 'UPDATE' THEN
+            PERFORM pg_notify(CAST('${own_channel_name}' AS text), row_to_json(NEW)::text);
+         END IF;
+         RETURN NEW;
+      END;
+   $$ LANGUAGE "plpgsql";`;
+```
+
+To create Trigger, use one of the predefined triggers from the list of [triggers](#triggers) or create your own.
+
+**Note:** If you create your owm trigger, use a name of a corresponding function to set it on event.
+
+**Example:**
+
+```javascript
+const customTrigger = Triggers.custom({schema: 'public', table: 'test', triggerName: 'test_trigger_name' }, {before: false, update: true, when: "OLD.id = '12345'"});
+const afterAllTrigger = Triggers.afterAll({schema: 'public', table: 'test'});
+
+const own_channel_name = 'own_channel_name';
+const ownFunction = `
+   CREATE OR REPLACE FUNCTION ${own_channel_name}_notifier() RETURNS TRIGGER AS $$
+      BEGIN
+         IF TG_OP = 'UPDATE' THEN
+            PERFORM pg_notify(CAST('${own_channel_name}' AS text), row_to_json(NEW)::text);
+         END IF;
+         RETURN NEW;
+      END;
+   $$ LANGUAGE "plpgsql";`;
+```
 
 ### Response
 
@@ -42,7 +95,11 @@ new SSEConnector(ctx.response);
 new SocketConnector(ctx.response);
 ```
 
-### Subscriber
+### Connection
+
+
+
+## Subscriber
 
 To manage subscriptions use **Subscriber** class. This class takes **SubClient** instance as an input parameter and use it to connect to the PostgreSQL.
 
