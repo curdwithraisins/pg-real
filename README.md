@@ -67,23 +67,62 @@ const ownFunction = `
 To create Trigger, use one of the predefined triggers from the list of [triggers](#triggers) or create your own.
 
 **Note:** If you create your owm trigger, use a name of a corresponding function to set it on event.
+**Note:** For custom trigger triggerName should be equal to the channel name.
 
 **Example:**
 
 ```javascript
-const customTrigger = Triggers.custom({schema: 'public', table: 'test', triggerName: 'test_trigger_name' }, {before: false, update: true, when: "OLD.id = '12345'"});
-const afterAllTrigger = Triggers.afterAll({schema: 'public', table: 'test'});
+const customTrigger = Triggers.custom({schema: 'public', table: 'test', triggerName: 'own_channel_name' }, {before: false, update: true, when: "OLD.id = '12345'"});
+const afterAllTrigger = Triggers.afterAll({schema: 'public', table: 'test'}, { when: "OLD.id = '12345'" });
 
-const own_channel_name = 'own_channel_name';
+const own_trigger_name = 'own_channel_name';
 const ownFunction = `
-   CREATE OR REPLACE FUNCTION ${own_channel_name}_notifier() RETURNS TRIGGER AS $$
-      BEGIN
-         IF TG_OP = 'UPDATE' THEN
-            PERFORM pg_notify(CAST('${own_channel_name}' AS text), row_to_json(NEW)::text);
-         END IF;
-         RETURN NEW;
-      END;
-   $$ LANGUAGE "plpgsql";`;
+   DROP TRIGGER IF EXISTS ${own_trigger_name} ON public.test;
+   CREATE TRIGGER ${own_trigger_name} AFTER INSERT OR UPDATE OR DELETE ON public.test FOR EACH ROW WHEN OLD.id = '12345' EXECUTE PROCEDURE ${own_channel_name}_notifier();`;   
+```
+
+After creation set function to the client using **setFunction** and **setTrigger** methods of the **SubClient** instance.
+
+**Example:**
+
+```javascript
+await client.setFunctions(customFunction.function);
+await client.setTriggers(customTrigger.trigger);
+```
+
+### Connection
+
+
+
+### Subscription
+
+To subscribe on the Postgres events use **Subscriber** class. Pass **SubClient** or [node-postgres Client](https://node-postgres.com/api/client) during instantiation of the class.
+
+**Example:**
+
+```javascript
+const subscriber = new Subscriber(client);
+```
+
+To kick listening on a trigger use **startListen** method. Postgres starts consume events for a corresponding trigger and call notifier.
+
+**Example:**
+
+```javascript
+subscriber.startListen(customTrigger.name);
+```
+
+After that you can subscribe on the events from notifier.
+
+**Note:** We are highly recommend you to store subscription id for the farther ability to unsubscribe.
+
+**Example:**
+
+```javascript
+  const afterAllSubscribtionId = await subscriber.subscribe(afterAllFunction.channel, connection.send.bind(connection.send));
+  const customSubscribtionId = await subscriber.subscribe(customFunction.channel, (channel, payload) => {
+      // Do what you need here
+  });
 ```
 
 ### Response
@@ -94,10 +133,6 @@ new HttpConnector(ctx.response);
 new SSEConnector(ctx.response);
 new SocketConnector(ctx.response);
 ```
-
-### Connection
-
-
 
 ## Subscriber
 
