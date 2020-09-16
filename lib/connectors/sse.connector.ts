@@ -9,9 +9,6 @@ export class SSEConnector {
 
     constructor(res: any) {
         this.res = res;
-    }
-
-    public initStream() {
         typeof this.res.status === "function" ? this.res.status(200) : this.res.status = 200;
         this.res.set({
             "Content-Type": "text/event-stream;charset=utf-8",
@@ -19,7 +16,6 @@ export class SSEConnector {
             "Cache-Control": "no-cache",
         });
         this.res.body = new PassThrough();
-        return this;
     }
 
     /**

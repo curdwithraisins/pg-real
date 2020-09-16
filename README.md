@@ -92,7 +92,16 @@ await client.setTriggers(customTrigger.trigger);
 
 ### Connection
 
+You can initialize any kind of a connection using **pg-real** module: **HTTP(S)**, **SSE**, and **WebSockets**. Each connection class takes response context as an input parameters during instantiation.
 
+It's not required to use **pg-real** connectors. You can set all the headers and statuses by yourself, just ensure to implement a correct subscription callback.
+
+**Example:**
+
+```javascript
+const connection = new SSEConnector(ctx.response).send('start');
+connection.send(channel, payload);
+```
 
 ### Subscription
 
@@ -119,19 +128,48 @@ After that you can subscribe on the events from notifier.
 **Example:**
 
 ```javascript
-  const afterAllSubscribtionId = await subscriber.subscribe(afterAllFunction.channel, connection.send.bind(connection.send));
+  const afterAllSubscribtionId = await subscriber.subscribe(afterAllFunction.channel, connection.send.bind(connection));
   const customSubscribtionId = await subscriber.subscribe(customFunction.channel, (channel, payload) => {
-      // Do what you need here
+      /**
+      * Do what you need here
+      * For instance, connection.send(channel, payload)
+      * */
   });
 ```
 
-### Response
+### Client side
 
-To send response to the client on the event occurrence choose and create one of the connectors:
+From client side, make request to API. Specify any information which could help to implement a correct subscription.
+
+**Example:**
+
 ```javascript
-new HttpConnector(ctx.response);
-new SSEConnector(ctx.response);
-new SocketConnector(ctx.response);
+const source = new EventSource(`http://${host}:${port}/${endpoint}?id=12345`);
+
+source.addEventListener('message', function (event) {
+    console.log(JSON.parse(event.data));
+}, false);
+
+source.addEventListener('own_channel_name', function (event) {
+    console.log(JSON.parse(event.data));
+}, false);
+```
+
+### Unsubscription
+
+Try always unsubscribe from the triggers: on the end of connection, after client unsubscribe, etc.
+
+**Example:**
+
+```javascript
+ctx.request.on('close', () => {
+    subscriber.unsubscribe(customFunction.channel, customSubscribtionId);
+});
+
+router.post('/unsubscribe', (ctx) => {
+    const { channel, id } = ctx.request.body;
+    subscriber.unsubscribe(channel, id);
+});
 ```
 
 ## Subscriber
@@ -304,14 +342,13 @@ Values:
 * **res** - response object;
 
 Methods:
-* **initStream** - sets status(200), headers and creates stream;
 * **send**: **<payload: string, channel: string>** - sends message to the stream. Channel is an optional.
 
 **Example:**
 ````
-1) new SSEConnector(ctx.response).initStream().send('start');
+1) new SSEConnector(ctx.response).send('start');
 
-2) new SSEConnector(ctx.response).initStream().send('start', 'after_insert_users');
+2) new SSEConnector(ctx.response).send('start', 'after_insert_users');
 ````
 
 ### WebSockets
