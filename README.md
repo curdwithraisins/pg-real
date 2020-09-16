@@ -7,8 +7,12 @@ A simple module which helps to manage a pub/sub behavior with the PostgreSQL upd
 
 * [Installation](#installation)
 * [Usage](#usage)
+    * [Initialization](#initialization)
+    * [Set Functions and Triggers](#set-functions-and-triggers)
     * [Connection](#connection)
-    * [Response](#response)
+    * [Subscription](#subscription)
+    * [Client side](#client-side)
+    * [Unsubscription](#unsubscription)
 * [Subscriber](#subscriber)
 * [Client](#client)
 * [Functions](#functions)
