@@ -3,7 +3,7 @@
  */
 import { SubClient } from "@lib/postgres/client";
 import { IListeners } from "@pack-types/index";
-import { cloneDeep, isArray, keys, values } from "lodash";
+import { cloneDeep, difference, isArray, keys, values } from "lodash";
 import { PassThrough } from "stream";
 import * as uuid from "uuid";
 
@@ -84,8 +84,8 @@ export class Subscriber {
      * @param channels: string | string[]
      */
     public async startListen(channels: string | string[]) {
-        if (!channels || !channels.length) {
-            throw Error("Provide channels names to start listen to.");
+        if (!channels || (isArray(channels) && !channels.length)) {
+            throw new Error("Provide channels names to start listen to.");
         }
         let channelsKeys = cloneDeep(channels);
         if (!isArray(channelsKeys)) {
@@ -109,6 +109,10 @@ export class Subscriber {
         channelsKeys = channelsKeys || keys(this.listeners);
         if (!isArray(channelsKeys)) {
             channelsKeys = [channelsKeys];
+        }
+        const dif = difference(channelsKeys, keys(this.listeners));
+        if (dif.length) {
+            throw new Error(`No channels like ${dif.join(', ')}.`);
         }
         await this.client.dropListeners(channelsKeys);
         channelsKeys.forEach((key) => {

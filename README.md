@@ -15,8 +15,8 @@ A simple module which helps to manage a pub/sub behavior with the PostgreSQL upd
     * [Unsubscription](#unsubscription)
 * [Subscriber](#subscriber)
 * [Client](#client)
-* [Functions](#functions)
-* [Triggers](#triggers)
+    * [Functions](#functions)
+    * [Triggers](#triggers)
     * [Why uniques is important?](#why-uniques-is-important)
 * [Connectors](#connectors)
     * [HTTP/HTTPS](#httphttps)
@@ -276,7 +276,7 @@ const { channel } = Functions.afterAll('public', 'test');
 client.removeListeners(channel);
 ```
 
-## Functions
+###Functions
 
 As per Postgres documentation:
 ````
@@ -286,7 +286,7 @@ For more information reference [an official documentation](https://www.postgresq
 
 The functions handle events from Postgres based on the preconfitions 
 
-## Triggers
+### Triggers
 
 As per Postgres documentation:
 ````
@@ -311,7 +311,7 @@ The list of trigger generators:
 where options could be:
 * **unique**: boolean - create a unique trigger name.
 
-#### Why uniques is important?
+### Why uniques is important?
 
 When we want to subscribe a client to a specific event based on the client specific data (id, filter, etc.) and we want to be triggered only for him, but we've already have a trigger on the same table we need to specify a unique trigger to not override an existent one. 
 
