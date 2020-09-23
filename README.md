@@ -14,7 +14,7 @@ A simple module which helps to manage a pub/sub behavior with the PostgreSQL upd
     * [Client side](#client-side)
     * [Unsubscription](#unsubscription)
 * [Subscriber](#subscriber)
-* [Client](#client)
+* [SubClient](#subclient)
     * [Functions](#functions)
     * [Triggers](#triggers)
     * [Why uniques is important?](#why-uniques-is-important)
@@ -48,7 +48,7 @@ client.connect();
 
 To create Function, use one of the predefined functions from the list of [functions](#functions) or create your own.
 
-**Note:** If you create your owm function, use a name of a notification channel to subscribe on the Postgres updates.
+> **Note:** If you create your owm function, use a name of a notification channel to subscribe on the Postgres updates.
 
 **Example:**
 
@@ -70,8 +70,9 @@ const ownFunction = `
 
 To create Trigger, use one of the predefined triggers from the list of [triggers](#triggers) or create your own.
 
-**Note:** If you create your owm trigger, use a name of a corresponding function to set it on event.
-**Note:** For custom trigger triggerName should be equal to the channel name.
+> **Note:** If you create your owm trigger, use a name of a corresponding function to set it on event.
+
+> **Note:** For custom trigger triggerName should be equal to the channel name.
 
 **Example:**
 
@@ -127,7 +128,7 @@ subscriber.startListen(customTrigger.name);
 
 After that you can subscribe on the events from notifier.
 
-**Note:** We are highly recommend you to store subscription id for the farther ability to unsubscribe.
+> **Note:** We are highly recommend you to store subscription id for the farther ability to unsubscribe.
 
 **Example:**
 
@@ -186,95 +187,74 @@ const subscriber = new Subscriber(client);
 
 **SubClient** includes several useful methods:
 
-To subscribe to the events use **subscribe** function to link channel and corresponding receiver. If a list of channels aren't specified the corresponding receiver will be linked to all of them. Receiver could be:
-* function;
-* stream;
-* the send method of one of the [connectors](#connection).
+* **subscribe**: *Function | Stream | Connector.send* - subscribes to the events, links channel to a corresponding receiver. The corresponding receiver will receive a message based on the channel name. If a list of the channels don't specified, the receiver will be linked to the all of them. Receiver could be:
+    * function;
+    * stream;
+    * send method of the [connector](#connection).
+    ```javascript
+    const fn = (channel, payload) => { console.log(channel, payload); };
+    subscriber.subscribe("channel_1", fn);
+    subscriber.subscribe("channel_2", new PassThrough());
+    subscriber.subscribe(["channel_1", "channel_2"], connector.send.bind(connector));
+    ```    
+* **startListen**: *string | string[]* - starts listening on the event:
+    ```javascript
+    subscriber.startListen("channel_1");
+    subscriber.startListen(["channel_1", "channel_2"]);
+    ```
+* **stopListen**  - stops listening on the event (if no channels are specified, all listeners are unsubscribed):
+    ```javascript
+    subscriber.stopListen("channel_1");
+    subscriber.stoptListen(["channel_1", "channel_2"]);
+    subscriber.stoptListen();
+    ```
 
-```javascript
-const fn = (channel, payload) => { console.log(channel, payload); };
-subscriber.subscribe("channel_1", fn);
-subscriber.subscribe("channel_2", new PassThrough());
-subscriber.subscribe(["channel_1", "channel_2"], connector.send);
-```
+## SubClient
 
-This class sets notifier function for listener and send message to the listener based on the channel name. 
-
-> Channel name of the listener should correspond to the channel name of the function.
-
-To start listen to the events call **startListen** with the list of the channels:
-
-```javascript
-subscriber.startListen("channel_1");
-subscriber.startListen(["channel_1", "channel_2"]);
-```
-
-To stop listen to the events call **stopListen**  with the list of the channels. If no channels are specified, all listeners are unsubscribed:
-
-```javascript
-subscriber.stopListen("channel_1");
-subscriber.stoptListen(["channel_1", "channel_2"]);
-subscriber.stoptListen();
-```
-
-## Client
-
-A PostgreSQL Client is a basic thing we need for notifier. We recommend to use our **SubClient** from this lib but you also can use your own client.
-
+A PostgreSQL client is a main thing we need for notifier. We recommend to use our **SubClient** from this lib but you also can use your own client.
 ```javascript
 const connectionString = `postgres://${user}:${password}@${host}:${port}}/${database}`;
 const client = new SubClient(connectionString);
 this.client.connect().then(console.log(`Connected to ${connectionString}`));
 ```
 
-**SubClient** includes several useful methods:
+**SubClient** includes several the next methods:
 * **setFunctions**:*string | string[]* - takes query to create a function (go to [Functions](#functions) section to get more info);
-
-```javascript
-const { function } = Functions.afterAll('public', 'test');
-client.setFunctions(function);
-```
-
+    ```javascript
+    const { function } = Functions.afterAll('public', 'test');
+    client.setFunctions(function);
+    ```
 * **dropFunctions**:*string | string[]* - takes function name and drop it;
-
-```javascript
-const { name } = Functions.afterAll('public', 'test');
-client.dropFunctions(name);
-```
-
+    ```javascript
+    const { name } = Functions.afterAll('public', 'test');
+    client.dropFunctions(name);
+    ```
 * **setTrigger**:*string | string[]* - takes query to create a trigger (go to [Triggers](#triggers) section to get more info);
-
-```javascript
-const { trigger } = Triggers.afterAll({
-   schema: 'public', 
-   table: 'test' 
-});
-client.setTrigger(trigger);
-```
-
+    ```javascript
+    const { trigger } = Triggers.afterAll({
+      schema: 'public', 
+      table: 'test' 
+    });
+    client.setTrigger(trigger);
+    ```
 * **removeTriggers**:*string | string[]* - takes trigger name and drop it, Require schema and table name;
-
-```javascript
-const { name } = Triggers.afterAll({
-   schema: 'public', 
-   table: 'test' 
-});
-client.removeTriggers(name, 'public', 'test');
-```
-
+    ```javascript
+    const { name } = Triggers.afterAll({
+      schema: 'public', 
+      table: 'test' 
+    });
+    client.removeTriggers(name, 'public', 'test');
+    ```
 * **setListeners**:*string | string[]* - take channel name and activate listening;
-
-```javascript
-const { channel } = Functions.afterAll('public', 'test');
-client.setListeners(channel);
-```
-
+    ```javascript
+    const { channel } = Functions.afterAll('public', 'test');
+    client.setListeners(channel);
+    ```
 * **removeListeners**:*string | string[]* - take channel name and stop listening;
-
-```javascript
-const { channel } = Functions.afterAll('public', 'test');
-client.removeListeners(channel);
-```
+    ```javascript
+    const { channel } = Functions.afterAll('public', 'test');
+    client.removeListeners(channel);
+    ```
 
 ###Functions
 
@@ -299,17 +279,27 @@ pg-real uses triggers to subscribe to the database changes. User can both specif
 For predefined triggers database table name is required. You also can set schema path, 'public' schema is used by default. Columns names are optional and could be used for more accuracy. Trigger generators also take options parameters.
 
 The list of trigger generators:
-* **afterAll**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after any change on the table or column if defined;
-* **beforeAll**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before any change on the table or column if defined;
-* **afterInsert**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after insert to the table;
-* **beforeInsert**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before insert to the table;
-* **afterUpdate**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after update on the table or column if defined;
-* **beforeUpdate**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before any change on the table or column if defined;
-* **afterDelete**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits after delete on the table or column if defined;
-* **beforeDelete**: **schema: string, table: string, columns: string | string[], options: ITriggerOptions** - emits before delete on the table or column if defined;
+* **common**: **path: ITriggerPath, options: ITriggerOptions** - creates trigger based on the options;
+* **afterAll**: **path: ITriggerPath, options: ITriggerOptions** - emits after any change on the table or column if defined;
+* **beforeAll**: **path: ITriggerPath, options: ITriggerOptions** - emits before any change on the table or column if defined;
+* **afterInsert**: **path: ITriggerPath, options: ITriggerOptions** - emits after insert to the table;
+* **beforeInsert**: **path: ITriggerPath], options: ITriggerOptions** - emits before insert to the table;
+* **afterUpdate**: **path: ITriggerPath, options: ITriggerOptions** - emits after update on the table or column if defined;
+* **beforeUpdate**: **path: ITriggerPath, options: ITriggerOptions** - emits before any change on the table or column if defined;
+* **afterDelete**: **path: ITriggerPath, options: ITriggerOptions** - emits after delete on the table or column if defined;
+* **beforeDelete**: **path: ITriggerPath, options: ITriggerOptions** - emits before delete on the table or column if defined;
 
-where options could be:
-* **unique**: boolean - create a unique trigger name.
+where path includes:
+* **schema**: *string* - schema name, default: *public*;
+* **table**: *string* - table name, required;
+* **columns**: *string[]* - list of columns, used for the update events;
+* **triggerName**: *string* - custom trigger name, used only for **custom** method;
+
+and options could be:
+* **unique**: *boolean* - creates unique trigger name;
+* **when**: *string* - adds where close for the update events;
+* **insert, update, delete**: *boolean* - used only in the common trigger, indicates a type of the event;
+* **before**: *boolean* - if true, creates before trigger; if false, creates after trigger.
 
 ### Why uniques is important?
 
@@ -332,7 +322,6 @@ Methods:
 **Example:**
 ````
 1) new HttpConnector(ctx.response).send('start');
-
 2) new HttpConnector(ctx.response).send('start', 'after_insert_users');
 ````
 
@@ -340,7 +329,7 @@ Methods:
 
 Use **SSEConnector** to create new SSE connection. Response object should be supplied as an input parameter. 
 
-**Note:** Supports Express and Koa.
+> **Note:** Supports Express and Koa.
 
 Values:
 * **res** - response object;
@@ -351,7 +340,6 @@ Methods:
 **Example:**
 ````
 1) new SSEConnector(ctx.response).send('start');
-
 2) new SSEConnector(ctx.response).send('start', 'after_insert_users');
 ````
 
@@ -359,7 +347,7 @@ Methods:
 
 Use **SocketConnector** to create new WebSocket connection. Socket object should be supplied as an input parameter. 
 
-**Note:** Supports Express and Koa.
+> **Note:** Supports Express and Koa.
 
 Values:
 * **socket** - socket object;
@@ -370,6 +358,5 @@ Methods:
 **Example:**
 ````
 1) new SocketConnector(socket).send('start');
-
 2) new SocketConnector(socket).send('start', 'after_insert_users');
 ````
