@@ -187,7 +187,7 @@ const subscriber = new Subscriber(client);
 
 **SubClient** includes several useful methods:
 
-* **subscribe**: *Function | Stream | Connector.send* - subscribes to the events, links channel to a corresponding receiver. The corresponding receiver will receive a message based on the channel name. If a list of the channels don't specified, the receiver will be linked to the all of them. Receiver could be:
+* **subscribe**: *Function | Stream | Connector.send* - subscribes to the events, links channel to a corresponding receiver. The receiver will get  a message based on the channel name. If a list of the channels don't specified, the receiver will be linked to the all of them. Receiver could be:
     * function;
     * stream;
     * send method of the [connector](#connection).
@@ -197,6 +197,12 @@ const subscriber = new Subscriber(client);
     subscriber.subscribe("channel_2", new PassThrough());
     subscriber.subscribe(["channel_1", "channel_2"], connector.send.bind(connector));
     ```    
+* **unsubscribe**: *string, string* - unsubscribes from the events, unlinks channel from a corresponding receiver. If nothing is supplied, all subscribers are removed. If only channel is sent, all subscribers to that channel are unsubscribed.
+    ```javascript
+    subscriber.unsubscribe();
+    subscriber.unsubscribe("channel_1");
+    subscriber.unsubscribe("channel_2", customSubscribtionId);
+    ```        
 * **startListen**: *string | string[]* - starts listening on the event:
     ```javascript
     subscriber.startListen("channel_1");
