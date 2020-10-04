@@ -208,11 +208,11 @@ const subscriber = new Subscriber(client);
     subscriber.startListen("channel_1");
     subscriber.startListen(["channel_1", "channel_2"]);
     ```
-* **stopListen**  - stops listening on the event (if no channels are specified, all listeners are unsubscribed):
+* **stopListen**: *string | string[]* - stops listening on the event (if no channels are specified, all listeners are unsubscribed):
     ```javascript
+    subscriber.stopListen();
     subscriber.stopListen("channel_1");
-    subscriber.stoptListen(["channel_1", "channel_2"]);
-    subscriber.stoptListen();
+    subscriber.stopListen(["channel_1", "channel_2"]);
     ```
 
 ## SubClient
