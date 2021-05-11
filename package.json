@@ -38,7 +38,7 @@
     "test": "mocha 'tests/*.js' --reporter spec"
   },
   "dependencies": {
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "pg": "7.12.1",
     "uuid": "3.3.3"
   },
