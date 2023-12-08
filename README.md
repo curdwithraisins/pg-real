@@ -262,7 +262,7 @@ this.client.connect().then(console.log(`Connected to ${connectionString}`));
     client.removeListeners(channel);
     ```
 
-###Functions
+### Functions
 
 As per Postgres documentation:
 ````
